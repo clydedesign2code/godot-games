@@ -1,6 +1,6 @@
 # Godot 4 — per-game directories
 games/*/.godot/
-games/*/*.uid
+**/*.uid
 games/*/export_presets.cfg
 
 # Exported builds
