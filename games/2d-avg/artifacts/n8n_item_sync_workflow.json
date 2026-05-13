@@ -1,0 +1,113 @@
+{
+  "name": "Godot AVG - Notion 道具同步管線",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "When Notion Updated",
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.property_同步狀態}}",
+              "operation": "contains",
+              "value2": "🚀"
+            }
+          ]
+        }
+      },
+      "id": "filter",
+      "name": "Only Synced",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst id = item.property_ID || 'unknown_item';\nconst name = item.property_名稱 || '';\nconst desc = item.property_描述 || '';\nconst isConsumable = item.property_消耗品 === true;\nconst iconPath = item.property_圖示路徑 || '';\n\nconst content = `[gd_resource type=\"Resource\" script_class=\"ItemResource\" load_steps=2 format=3]\n\n[ext_resource type=\"Script\" path=\"res://src/core/resources/ItemResource.gd\" id=\"1_script\"]\n\n[resource]\nscript = ExtResource(\"1_script\")\nitem_id = \"${id}\"\nitem_name = \"${name}\"\ndescription = \"${desc}\"\nis_consumable = ${isConsumable}\n`;\n\nreturn {\n  id,\n  path: `src/items/${id}.tres`,\n  content\n};"
+      },
+      "id": "transformer",
+      "name": "Generate .tres",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "owner": "clydedesign2code",
+        "repository": "_Godot_2D_AVG",
+        "operation": "update",
+        "filePath": "={{$json.path}}",
+        "fileContent": "={{$json.content}}",
+        "commitMessage": "=🔄 Sync item from Notion: {{$json.id}}"
+      },
+      "id": "github",
+      "name": "GitHub Commit",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "YOUR_GITHUB_CREDENTIAL_ID"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Notion Updated": {
+      "main": [
+        [
+          {
+            "node": "Only Synced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Synced": {
+      "main": [
+        [
+          {
+            "node": "Generate .tres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate .tres": {
+      "main": [
+        [
+          {
+            "node": "GitHub Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
