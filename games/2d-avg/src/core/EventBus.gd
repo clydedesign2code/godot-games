@@ -56,3 +56,18 @@ signal flag_changed(flag_key: String, value: Variant)
 
 ## 玩家死亡（若有戰鬥或計時機制）
 signal player_died()
+
+# ─── 磁帶日誌 ─────────────────────────────────────────────
+## 新增一筆錄音
+signal tape_entry_added(entry_id: String)
+
+## 播放一筆錄音（is_anomaly：是否為異常錄音）
+signal tape_entry_played(entry_id: String, is_anomaly: bool)
+
+## 磁帶播放器開啟 / 關閉
+signal tape_player_opened()
+signal tape_player_closed()
+
+# ─── 電台隨身聽 ────────────────────────────────────────────
+## 模式切換（RADIO = 0, CASSETTE = 1）
+signal radio_mode_changed(mode: int)

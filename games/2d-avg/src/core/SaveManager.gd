@@ -32,6 +32,9 @@ func save_game(slot_id: int) -> void:
 		"inventory": {
 			"items": InventoryManager.get_items()
 		},
+		"tape_journal": {
+			"entries": TapeManager.serialize()
+		},
 		"timestamp": Time.get_datetime_dict_from_system(),
 		"room_name": get_tree().current_scene.name if get_tree().current_scene else "Unknown"
 	}
@@ -82,7 +85,13 @@ func load_game(slot_id: int) -> void:
 			InventoryManager.clear()
 			for item_id in inv_data["items"]:
 				InventoryManager.add_item(item_id)
-				
+
+	# 3. 還原 磁帶日誌
+	if save_data.has("tape_journal"):
+		var tape_data = save_data["tape_journal"]
+		if tape_data.has("entries"):
+			TapeManager.deserialize(tape_data["entries"])
+
 	print("SaveManager: Slot %d loaded." % slot_id)
 
 # ─── 查詢 API ─────────────────────────────────────────────
