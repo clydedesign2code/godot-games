@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "godot-mcp-pro": {
+      "command": "node",
+      "args": [
+        "H:/GODOT MCP PRO/server/build/index.js"
+      ]
+    }
+  }
+}

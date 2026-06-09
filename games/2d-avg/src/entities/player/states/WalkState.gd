@@ -2,19 +2,19 @@ class_name PlayerWalkState
 extends State
 
 func enter() -> void:
-	# 日後在此播放 walk 動畫
-	pass
+	pass # 日後播放 walk 動畫
 
 func physics_update(_delta: float) -> void:
 	var player := state_machine.get_parent() as Player
 	if not player:
 		return
 
-	if player.nav_agent.is_navigation_finished():
+	var dir := Input.get_axis("move_left", "move_right")
+
+	if dir == 0.0:
 		state_machine.transition_to("idle")
 		return
 
-	var next_pos := player.nav_agent.get_next_path_position()
-	var direction := (next_pos - player.global_position).normalized()
-	player.velocity = direction * Player.WALK_SPEED
+	player.velocity.x = dir * Player.WALK_SPEED
+	player.animated_sprite.flip_h = dir < 0.0
 	player.move_and_slide()
