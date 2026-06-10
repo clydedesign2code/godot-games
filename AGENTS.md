@@ -18,7 +18,9 @@
 godot-games/
 ├── .agents/          ← ai-agent-skills submodule（跨工具共用規則）
 ├── games/            ← 各遊戲獨立子目錄，每個子目錄都是完整 Godot 專案
-│   └── 2d-avg/       ← 2D 像素解謎冒險（原 _Godot_2D_AVG）
+│   ├── 2d-avg/         ← 2D 像素解謎冒險（原 _Godot_2D_AVG）
+│   ├── udemy-frogger/  ← Udemy 課程：Frogger 複製版（已完成）
+│   └── udemy-metroid/  ← Udemy 課程：Metroid-like（起始包，待實作）
 └── shared/           ← 預留跨遊戲共用資源
 ```
 
@@ -28,9 +30,11 @@ godot-games/
 
 ## 遊戲技術棧
 
-| 目錄 | 引擎版本 | Addons | 主要語言 |
-|------|---------|--------|---------|
-| `games/2d-avg/` | Godot 4.6 | Dialogic 2.0 | GDScript |
+| 目錄 | 引擎版本 | Addons | 主要語言 | 備注 |
+|------|---------|--------|---------|------|
+| `games/2d-avg/` | Godot 4.6 | Dialogic 2.0 | GDScript | 原創冒險遊戲 |
+| `games/udemy-frogger/` | Godot 4 | — | GDScript | Udemy 課程習作，已完成 |
+| `games/udemy-metroid/` | Godot 4 | — | GDScript | Udemy 課程習作，起始包待實作 |
 
 ---
 
@@ -51,6 +55,12 @@ godot-games/
 ---
 
 ## 📜 決策與進度日誌
+
+### 2026-06-10 | Udemy 課程專案整合
+- **來源**：`_GodotProjects-udemy/`（外部 repo）→ monorepo
+- **udemy-frogger**：完整可執行的 Frogger 遊戲，含 scenes/、audio/、fonts/、graphics/
+- **udemy-metroid**：Udemy 起始包（assets + project.godot），Metroid-like 遊戲待實作
+- **原則**：課程習作與原創遊戲平行存放，不共用資源，res:// 路徑各自獨立
 
 ### 2026-05-13 | Monorepo 初始化 + 2D AVG 遷移
 - **決策**：`godot-games` 採 monorepo，每個遊戲放 `games/<name>/`，廢棄 `_Godot_2D_AVG` 獨立 repo
