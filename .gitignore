@@ -29,3 +29,6 @@ games/*/export_presets.cfg
 # Claude Code / Agent local files
 .claude/
 .tmp/
+
+# IDE
+.cursor/
