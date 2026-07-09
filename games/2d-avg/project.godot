@@ -16,7 +16,17 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Dialogic="*uid://c25maejbldba2"
+Dialogic="*uid://ds2q0uclmolvu"
+Globals="*res://game/popochiu_globals.gd"
+Cursor="*uid://c2pqh7ajiuiy0"
+E="*uid://rda8wggldt5o"
+R="*res://game/autoloads/r.gd"
+C="*res://game/autoloads/c.gd"
+I="*res://game/autoloads/i.gd"
+D="*res://game/autoloads/d.gd"
+A="*res://game/autoloads/a.gd"
+G="*uid://blk6nfpfiqrd2"
+T="*uid://30lm6k5s368s"
 
 [dialogic]
 
@@ -26,7 +36,7 @@ layout/style_directory={}
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/popochiu/editor/gizmos/plugin.cfg", "res://addons/popochiu/editor/importers/plugin.cfg", "res://addons/popochiu/plugin.cfg")
 
 [input]
 
