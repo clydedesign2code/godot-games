@@ -11,28 +11,41 @@ config_version=5
 [application]
 
 config/name="2D-AVG"
+run/main_scene="uid://dxxavchheiah5"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-Dialogic="*uid://ds2q0uclmolvu"
-Globals="*res://game/popochiu_globals.gd"
+Dialogic="*uid://c25maejbldba2"
+Globals="*uid://c3m2pf643rh3s"
 Cursor="*uid://c2pqh7ajiuiy0"
 E="*uid://rda8wggldt5o"
-R="*res://game/autoloads/r.gd"
-C="*res://game/autoloads/c.gd"
-I="*res://game/autoloads/i.gd"
-D="*res://game/autoloads/d.gd"
-A="*res://game/autoloads/a.gd"
-G="*uid://blk6nfpfiqrd2"
-T="*uid://30lm6k5s368s"
+R="*uid://bch8dy2itnfjd"
+C="*uid://c2om7cu1k4iub"
+I="*uid://7otqo5iewupg"
+D="*uid://b4morwdcgdqt0"
+A="*uid://swsqwm21hb3q"
+G="*uid://cnvamj1jhe02y"
+T="*uid://bf0rvujx88vy5"
+MCPScreenshot="*res://addons/godot_mcp/mcp_screenshot_service.gd"
+MCPInputService="*res://addons/godot_mcp/mcp_input_service.gd"
+MCPGameInspector="*res://addons/godot_mcp/mcp_game_inspector_service.gd"
 
 [dialogic]
 
 directories/dch_directory={}
 directories/dtl_directory={}
 layout/style_directory={}
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [editor_plugins]
 

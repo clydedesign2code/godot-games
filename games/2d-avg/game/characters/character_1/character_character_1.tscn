@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dxxavchheiah5"]
+
+[ext_resource type="Script" uid="uid://bjq76co28grrh" path="res://game/characters/character_1/character_character_1.gd" id="1_g16vx"]
+
+[node name="CharacterCharacter1" type="Area2D" unique_id=494178080]
+script = ExtResource("1_g16vx")
+script_name = "Character1"
+description = "Character 1"
+cursor = 8
+interaction_polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+
+[node name="ScalingPolygon" type="CollisionPolygon2D" parent="." unique_id=1882832910]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1078569080]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1113242991]
+
+[node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1847663221]
+visible = false
+polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+
+[node name="ObstaclePolygon" type="NavigationObstacle2D" parent="." unique_id=65155719]
+visible = false
+vertices = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+affect_navigation_mesh = true
+carve_navigation_mesh = true

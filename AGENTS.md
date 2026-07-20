@@ -62,6 +62,12 @@ godot-games/
 - **udemy-metroid**：Udemy 起始包（assets + project.godot），Metroid-like 遊戲待實作
 - **原則**：課程習作與原創遊戲平行存放，不共用資源，res:// 路徑各自獨立
 
+### 2026-07-20 | Popochiu 最小骨架重建
+- **背景**：`547d620` 安裝 Popochiu v2.1.1 後，開啟編輯器觸發首次設定精靈，自動生成完整 demo（Clyde 角色、BedRoom/Kitchen/GuestRoom 三房、SimpleClickHighRes GUI），與 `DESIGN.md` 定位（Popochiu 僅供「他者時代／靈魂閃回」片段使用）不符
+- **決策**：清空 demo 素材（`game/characters`、`game/gui`、`game/rooms`），還原 `c.gd`/`r.gd`/`popochiu_data.cfg`，`project.godot` 僅移除 demo 的 `run/main_scene`，保留 godot_mcp autoloads 與 1920x1080 `canvas_items` 顯示設定（與 demo 無關的既有變更）
+- **完成**：已透過 Popochiu dock 建立最小骨架 `Room1`（`game/rooms/room_1/`）+ `Character1`（`game/characters/character_1/`），GUI 樣板（`game/gui/`，SimpleClickHighRes）為必要框架本體一併生成，非 demo 內容
+- **待辦**：驗證房間導航/對話樹可跑通後，再依 `DESIGN.md` 的 Pentiment 式他者時代場次，逐步把 `Room1`/`Character1` 替換或擴充為實際場景與角色
+
 ### 2026-05-13 | Monorepo 初始化 + 2D AVG 遷移
 - **決策**：`godot-games` 採 monorepo，每個遊戲放 `games/<name>/`，廢棄 `_Godot_2D_AVG` 獨立 repo
 - **遷移內容**：`src/`（23 GDScript 檔）、`assets/`、`addons/`（Dialogic 2.0）、`dialogic/`、`fonts/`、`resources/`、`artifacts/`、`_steam/`、`project.godot`

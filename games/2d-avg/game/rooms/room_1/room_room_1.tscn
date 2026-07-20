@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://o5xbnhok77ng"]
+
+[ext_resource type="Script" path="res://game/rooms/room_1/room_room_1.gd" id="1_h1i7g"]
+
+[node name="RoomRoom1" type="Node2D" unique_id=1713955340]
+script = ExtResource("1_h1i7g")
+script_name = "Room1"
+width = 1920
+height = 1080
+
+[node name="WalkableAreas" type="Node2D" parent="." unique_id=1574528853]
+
+[node name="Props" type="Node2D" parent="." unique_id=655859053]
+
+[node name="Hotspots" type="Node2D" parent="." unique_id=991412100]
+
+[node name="Regions" type="Node2D" parent="." unique_id=1643207577]
+
+[node name="Markers" type="Node2D" parent="." unique_id=1010276862]
+
+[node name="Characters" type="Node2D" parent="." unique_id=1426889708]
