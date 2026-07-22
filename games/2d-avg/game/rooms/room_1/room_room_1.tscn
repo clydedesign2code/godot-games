@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://o5xbnhok77ng"]
 
-[ext_resource type="Script" path="res://game/rooms/room_1/room_room_1.gd" id="1_h1i7g"]
+[ext_resource type="Script" uid="uid://dxim6xygp34gb" path="res://game/rooms/room_1/room_room_1.gd" id="1_h1i7g"]
+[ext_resource type="PackedScene" uid="uid://vhjhljgh5vo8" path="res://game/rooms/room_1/walkable_areas/main/walkable_area_main.tscn" id="2_gtbls"]
+[ext_resource type="PackedScene" uid="uid://bibdtqiai5fqb" path="res://game/rooms/room_1/hotspots/test/hotspot_test.tscn" id="3_x1p7s"]
+[ext_resource type="PackedScene" uid="uid://c2njm0y6bih6a" path="res://game/rooms/room_1/hotspots/clue/hotspot_clue.tscn" id="4_whf4p"]
 
 [node name="RoomRoom1" type="Node2D" unique_id=1713955340]
 script = ExtResource("1_h1i7g")
@@ -10,9 +13,22 @@ height = 1080
 
 [node name="WalkableAreas" type="Node2D" parent="." unique_id=1574528853]
 
+[node name="Main" parent="WalkableAreas" unique_id=2046856214 instance=ExtResource("2_gtbls")]
+
 [node name="Props" type="Node2D" parent="." unique_id=655859053]
 
 [node name="Hotspots" type="Node2D" parent="." unique_id=991412100]
+
+[node name="Test" parent="Hotspots" unique_id=910535856 instance=ExtResource("3_x1p7s")]
+position = Vector2(960, 540)
+baseline = -335
+interaction_polygon = PackedVector2Array(-809.1428, -357.71423, -327.99976, -289.14282, -273.7143, 360.5713, -820.5714, 472)
+
+[node name="Clue" parent="Hotspots" unique_id=774115758 instance=ExtResource("4_whf4p")]
+position = Vector2(960, 540)
+walk_to_point = Vector2(1234.2854, -300.00012)
+look_at_point = Vector2(282.85718, -362.85718)
+interaction_polygon = PackedVector2Array(142.28564, -83.42859, 220.6438, -418.09143, 343.42847, -263.4286, 560.57153, -219.42847, 486.35803, -100.94861, 253.71436, -62.285645)
 
 [node name="Regions" type="Node2D" parent="." unique_id=1643207577]
 

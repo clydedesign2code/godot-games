@@ -66,7 +66,8 @@ godot-games/
 - **背景**：`547d620` 安裝 Popochiu v2.1.1 後，開啟編輯器觸發首次設定精靈，自動生成完整 demo（Clyde 角色、BedRoom/Kitchen/GuestRoom 三房、SimpleClickHighRes GUI），與 `DESIGN.md` 定位（Popochiu 僅供「他者時代／靈魂閃回」片段使用）不符
 - **決策**：清空 demo 素材（`game/characters`、`game/gui`、`game/rooms`），還原 `c.gd`/`r.gd`/`popochiu_data.cfg`，`project.godot` 僅移除 demo 的 `run/main_scene`，保留 godot_mcp autoloads 與 1920x1080 `canvas_items` 顯示設定（與 demo 無關的既有變更）
 - **完成**：已透過 Popochiu dock 建立最小骨架 `Room1`（`game/rooms/room_1/`）+ `Character1`（`game/characters/character_1/`），GUI 樣板（`game/gui/`，SimpleClickHighRes）為必要框架本體一併生成，非 demo 內容
-- **待辦**：驗證房間導航/對話樹可跑通後，再依 `DESIGN.md` 的 Pentiment 式他者時代場次，逐步把 `Room1`/`Character1` 替換或擴充為實際場景與角色
+- **驗證通過**：房間導航（點擊走動）、Hotspot 觸發對話樹（`TestDialog`）、inventory item 線索追蹤（`Clue`，`I.Clue.add()`）三條技術流程都已跑通。過程中踩到三個坑，已寫進 `.agents/skills/godot_expert/SKILL.md` 的已知陷阱：Popochiu 缺少 Input Map 動作導致點擊無反應、房間裡手動塞角色會變不可互動的幽靈副本、`project.godot` 的 `run/main_scene` 文字編輯不可靠
+- **待辦**：目前 `Room1`/`Character1`/`TestDialog`/`Clue` 都是技術驗證用的占位命名，尚未清理成正式內容。依 `DESIGN.md` 的 Pentiment 式他者時代場次，下一步要決定第一個具體場景/角色，再把這些占位物件替換或擴充為實際內容
 
 ### 2026-05-13 | Monorepo 初始化 + 2D AVG 遷移
 - **決策**：`godot-games` 採 monorepo，每個遊戲放 `games/<name>/`，廢棄 `_Godot_2D_AVG` 獨立 repo

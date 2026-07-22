@@ -1,0 +1,9 @@
+[gd_resource type="Resource" format=3 uid="uid://dc8q0pwxkxbd"]
+
+[ext_resource type="Script" path="res://game/inventory_items/clue/inventory_item_clue_state.gd" id="1_kaxyt"]
+
+[resource]
+resource_name = "Clue"
+script = ExtResource("1_kaxyt")
+script_name = "Clue"
+scene = "res://game/inventory_items/clue/inventory_item_clue.tscn"

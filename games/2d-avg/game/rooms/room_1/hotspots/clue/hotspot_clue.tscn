@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://c2njm0y6bih6a"]
+
+[ext_resource type="Script" path="res://game/rooms/room_1/hotspots/clue/hotspot_clue.gd" id="1_lnwcf"]
+
+[node name="Clue" type="Area2D" unique_id=774115758]
+script = ExtResource("1_lnwcf")
+script_name = "Clue"
+description = "Clue"
+cursor = 1
+interaction_polygon = PackedVector2Array()
+
+[node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=951079205]
+visible = false
+modulate = Color(1, 0, 1, 1)
+polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)

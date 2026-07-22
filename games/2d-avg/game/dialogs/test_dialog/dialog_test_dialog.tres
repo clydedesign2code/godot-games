@@ -1,0 +1,9 @@
+[gd_resource type="Resource" format=3 uid="uid://cxt26y4gmbho1"]
+
+[ext_resource type="Script" uid="uid://c3fg2mk0taihj" path="res://addons/popochiu/engine/objects/dialog/popochiu_dialog_option.gd" id="1_7j46x"]
+[ext_resource type="Script" path="res://game/dialogs/test_dialog/dialog_test_dialog.gd" id="2_mmosn"]
+
+[resource]
+resource_name = "TestDialog"
+script = ExtResource("2_mmosn")
+script_name = "TestDialog"

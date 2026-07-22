@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dxxavchheiah5"]
 
 [ext_resource type="Script" uid="uid://bjq76co28grrh" path="res://game/characters/character_1/character_character_1.gd" id="1_g16vx"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_placeholder"]
 
 [node name="CharacterCharacter1" type="Area2D" unique_id=494178080]
 script = ExtResource("1_g16vx")
@@ -15,6 +16,8 @@ polygon = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0)
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1078569080]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1113242991]
+texture = ExtResource("2_placeholder")
+scale = Vector2(0.3, 0.3)
 
 [node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1847663221]
 visible = false

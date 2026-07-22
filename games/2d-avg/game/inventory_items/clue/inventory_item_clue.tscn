@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://ca424r7bynmnc"]
+
+[ext_resource type="Script" uid="uid://jljrm7yxgss3" path="res://game/inventory_items/clue/inventory_item_clue.gd" id="1_isju2"]
+
+[node name="ItemClue" type="TextureRect" unique_id=1304371385]
+texture_filter = 1
+anchors_preset = -1
+anchor_top = -0.014
+anchor_right = 0.013
+anchor_bottom = 0.007
+offset_top = 15.120001
+offset_right = -24.960001
+offset_bottom = -7.5600004
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 0
+stretch_mode = 5
+script = ExtResource("1_isju2")
+script_name = "Clue"
+description = "Clue"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1657322855]

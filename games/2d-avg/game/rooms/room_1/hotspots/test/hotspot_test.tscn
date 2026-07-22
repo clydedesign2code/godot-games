@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bibdtqiai5fqb"]
+
+[ext_resource type="Script" path="res://game/rooms/room_1/hotspots/test/hotspot_test.gd" id="1_eq18w"]
+
+[node name="Test" type="Area2D" unique_id=910535856]
+script = ExtResource("1_eq18w")
+script_name = "Test"
+description = "Test"
+cursor = 1
+interaction_polygon = PackedVector2Array()
+
+[node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1455224721]
+visible = false
+modulate = Color(1, 0, 1, 1)
+polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)

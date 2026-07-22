@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://vhjhljgh5vo8"]
+
+[ext_resource type="Script" uid="uid://bgwmrdgw18pm7" path="res://game/rooms/room_1/walkable_areas/main/walkable_area_main.gd" id="1_clr3m"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_clr3m"]
+vertices = PackedVector2Array(971.1953, -547.47656, 986.53906, 547.25, 22.6875, 548.4922, 34.445313, -542.7344, -962.5781, -539.6797, -964.6172, 541.46875)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 3, 2, 5)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(34.446777, -542.73376, 971.1963, -547.479, 986.53735, 547.2506, 22.685791, 548.4911, -964.6184, 541.4684, -962.5757, -539.6775)])
+agent_radius = 0.0
+
+[node name="Main" type="Node2D" unique_id=2046856214]
+position = Vector2(960, 540)
+script = ExtResource("1_clr3m")
+script_name = "Main"
+description = "Main"
+interaction_polygon = Array[PackedVector2Array]([PackedVector2Array(34.446777, -542.73376, 971.1963, -547.479, 986.53735, 547.2506, 22.685791, 548.4911, -964.6184, 541.4684, -962.5757, -539.6775)])
+
+[node name="Perimeter" type="NavigationRegion2D" parent="." unique_id=829422031]
+modulate = Color(0, 1, 0, 1)
+navigation_polygon = SubResource("NavigationPolygon_clr3m")
