@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://bd1048xwe5ni5"]
+
+[ext_resource type="Script" uid="uid://ex5x2vt34nxh" path="res://game/characters/npc_1/character_npc_1.gd" id="1_dw1aw"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_placeholder"]
+
+[node name="CharacterNpc1" type="Area2D" unique_id=676436645]
+script = ExtResource("1_dw1aw")
+script_name = "Npc1"
+description = "Npc 1"
+cursor = 8
+interaction_polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+
+[node name="ScalingPolygon" type="CollisionPolygon2D" parent="." unique_id=324271770]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=84551281]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2065966039]
+texture = ExtResource("2_placeholder")
+scale = Vector2(0.3, 0.3)
+modulate = Color(0.3, 0.9, 1, 1)
+
+[node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1067362041]
+visible = false
+polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+
+[node name="ObstaclePolygon" type="NavigationObstacle2D" parent="." unique_id=147265035]
+visible = false
+vertices = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+affect_navigation_mesh = true
+carve_navigation_mesh = true

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://vhjhljgh5vo8" path="res://game/rooms/room_1/walkable_areas/main/walkable_area_main.tscn" id="2_gtbls"]
 [ext_resource type="PackedScene" uid="uid://bibdtqiai5fqb" path="res://game/rooms/room_1/hotspots/test/hotspot_test.tscn" id="3_x1p7s"]
 [ext_resource type="PackedScene" uid="uid://c2njm0y6bih6a" path="res://game/rooms/room_1/hotspots/clue/hotspot_clue.tscn" id="4_whf4p"]
+[ext_resource type="PackedScene" uid="uid://bd1048xwe5ni5" path="res://game/characters/npc_1/character_npc_1.tscn" id="5_hg5cj"]
 
 [node name="RoomRoom1" type="Node2D" unique_id=1713955340]
 script = ExtResource("1_h1i7g")
@@ -35,3 +36,11 @@ interaction_polygon = PackedVector2Array(142.28564, -83.42859, 220.6438, -418.09
 [node name="Markers" type="Node2D" parent="." unique_id=1010276862]
 
 [node name="Characters" type="Node2D" parent="." unique_id=1426889708]
+
+[node name="CharacterNpc1 *" parent="Characters" unique_id=676436645 instance=ExtResource("5_hg5cj")]
+position = Vector2(960, 540)
+baseline = -233
+walk_to_point = Vector2(31.563477, 199.24548)
+look_at_point = Vector2(278.97278, -79.36624)
+interaction_polygon = PackedVector2Array(-178.04474, 92.4021, 18, 137.42857, 322.45813, 185.92188, -125.53076, 227.9331)
+metadata/EDITOR_TMP_COPY_OF = "Npc1"
