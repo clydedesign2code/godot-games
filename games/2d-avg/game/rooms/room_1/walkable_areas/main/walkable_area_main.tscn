@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://bgwmrdgw18pm7" path="res://game/rooms/room_1/walkable_areas/main/walkable_area_main.gd" id="1_clr3m"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_clr3m"]
-vertices = PackedVector2Array(-962.5781, -539.6797, -249.625, -554.5703, -307.1328, -403.46875, -964.6172, 541.46875, -193.42188, 242, -290.08594, 391.9297, -287.84375, 426.91406, -271.25, 548.4922)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(3, 2, 4, 5), PackedInt32Array(3, 5, 6), PackedInt32Array(3, 6, 7)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-249.62592, -554.5701, -307.13074, -403.46997, -193.42175, 242.00208, -290.0854, 391.92932, -287.8443, 426.9143, -271.2505, 548.4912, -964.6184, 541.4684, -962.5757, -539.6775)])
+vertices = PackedVector2Array(-271.25, 548.4922, -964.6172, 541.46875, -962.5781, -539.6797, 1028.2188, -546.96094, 979.14844, -89.42969, 359.01563, 541.2031, 919.0547, 506.21875)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5), PackedInt32Array(5, 4, 6)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(979.14966, -89.42651, 919.0574, 506.21497, 359.01282, 541.2001, -271.2505, 548.4912, -964.6184, 541.4684, -962.5757, -539.6775, 1028.2194, -546.96045)])
 agent_radius = 0.0
 
 [node name="Main" type="Node2D" unique_id=2046856214]
@@ -13,7 +13,7 @@ position = Vector2(960, 540)
 script = ExtResource("1_clr3m")
 script_name = "Main"
 description = "Main"
-interaction_polygon = Array[PackedVector2Array]([PackedVector2Array(-249.62592, -554.5701, -307.13074, -403.46997, -193.42175, 242.00208, -290.0854, 391.92932, -287.8443, 426.9143, -271.2505, 548.4912, -964.6184, 541.4684, -962.5757, -539.6775)])
+interaction_polygon = Array[PackedVector2Array]([PackedVector2Array(979.14966, -89.42651, 919.0574, 506.21497, 359.01282, 541.2001, -271.2505, 548.4912, -964.6184, 541.4684, -962.5757, -539.6775, 1028.2194, -546.96045)])
 
 [node name="Perimeter" type="NavigationRegion2D" parent="." unique_id=829422031]
 modulate = Color(0, 1, 0, 1)

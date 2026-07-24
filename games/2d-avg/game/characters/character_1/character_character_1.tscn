@@ -1,30 +1,172 @@
 [gd_scene format=3 uid="uid://dxxavchheiah5"]
 
 [ext_resource type="Script" uid="uid://bjq76co28grrh" path="res://game/characters/character_1/character_character_1.gd" id="1_g16vx"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_placeholder"]
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Torso:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -2), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Torso/ArmL:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.05, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Torso/ArmR:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.05, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Torso:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -3), Vector2(0, 0), Vector2(0, -3), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Torso/ArmL:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.35, 0.0, -0.35, 0.0, 0.35]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Torso/ArmR:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.35, 0.0, 0.35, 0.0, -0.35]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Torso/LegL:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.3, 0.0, 0.3, 0.0, -0.3]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Torso/LegR:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.3, 0.0, -0.3, 0.0, 0.3]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_character1"]
+_data = {
+"idle": SubResource("Animation_idle"),
+"walk": SubResource("Animation_walk")
+}
 
 [node name="CharacterCharacter1" type="Area2D" unique_id=494178080]
 script = ExtResource("1_g16vx")
 script_name = "Character1"
 description = "Character 1"
 cursor = 8
-interaction_polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+interaction_polygon = PackedVector2Array(-16, -50, 16, -50, 16, 55, -16, 55)
 
 [node name="ScalingPolygon" type="CollisionPolygon2D" parent="." unique_id=1882832910]
 polygon = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1078569080]
+libraries = {
+"": SubResource("AnimationLibrary_character1")
+}
+autoplay = "idle"
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1113242991]
-texture = ExtResource("2_placeholder")
-scale = Vector2(0.3, 0.3)
+[node name="Rig" type="Node2D" parent="." unique_id=2020202020]
+
+[node name="Torso" type="Polygon2D" parent="Rig" unique_id=2020202021]
+color = Color(0.2, 0.55, 0.5, 1)
+polygon = PackedVector2Array(-9, -24, 9, -24, 12, 0, 9, 24, -9, 24, -12, 0)
+
+[node name="LegL" type="Polygon2D" parent="Rig/Torso" unique_id=2020202022]
+position = Vector2(-7, 22)
+color = Color(0.25, 0.3, 0.4, 1)
+polygon = PackedVector2Array(-4.5, 0, 4.5, 0, 4.5, 32, -4.5, 32)
+
+[node name="LegR" type="Polygon2D" parent="Rig/Torso" unique_id=2020202023]
+position = Vector2(7, 22)
+color = Color(0.25, 0.3, 0.4, 1)
+polygon = PackedVector2Array(-4.5, 0, 4.5, 0, 4.5, 32, -4.5, 32)
+
+[node name="ArmL" type="Polygon2D" parent="Rig/Torso" unique_id=2020202024]
+position = Vector2(-11, -20)
+color = Color(0.96, 0.8, 0.65, 1)
+polygon = PackedVector2Array(-4, 0, 4, 0, 4, 28, -4, 28)
+
+[node name="ArmR" type="Polygon2D" parent="Rig/Torso" unique_id=2020202025]
+position = Vector2(11, -20)
+color = Color(0.96, 0.8, 0.65, 1)
+polygon = PackedVector2Array(-4, 0, 4, 0, 4, 28, -4, 28)
+
+[node name="Head" type="Polygon2D" parent="Rig/Torso" unique_id=2020202026]
+position = Vector2(0, -35)
+color = Color(0.96, 0.8, 0.65, 1)
+polygon = PackedVector2Array(13, 0, 9.19, 9.19, 0, 13, -9.19, 9.19, -13, 0, -9.19, -9.19, 0, -13, 9.19, -9.19)
 
 [node name="InteractionPolygon" type="CollisionPolygon2D" parent="." unique_id=1847663221]
 visible = false
-polygon = PackedVector2Array(-10, -10, 10, -10, 10, 10, -10, 10)
+polygon = PackedVector2Array(-16, -50, 16, -50, 16, 55, -16, 55)
 
 [node name="ObstaclePolygon" type="NavigationObstacle2D" parent="." unique_id=65155719]
 visible = false
-vertices = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+vertices = PackedVector2Array(-16, -50, 16, -50, 16, 55, -16, 55)
 affect_navigation_mesh = true
 carve_navigation_mesh = true

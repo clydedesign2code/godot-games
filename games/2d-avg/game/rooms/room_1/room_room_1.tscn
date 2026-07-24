@@ -38,9 +38,8 @@ interaction_polygon = PackedVector2Array(142.28564, -83.42859, 220.6438, -418.09
 [node name="Characters" type="Node2D" parent="." unique_id=1426889708]
 
 [node name="CharacterNpc1 *" parent="Characters" unique_id=676436645 instance=ExtResource("5_hg5cj")]
-position = Vector2(960, 540)
-baseline = -233
-walk_to_point = Vector2(31.563477, 199.24548)
+position = Vector2(1500, 700)
+baseline = -10
+walk_to_point = Vector2(129.849, 89.53125)
 look_at_point = Vector2(278.97278, -79.36624)
-interaction_polygon = PackedVector2Array(-178.04474, 92.4021, 18, 137.42857, 322.45813, 185.92188, -125.53076, 227.9331)
 metadata/EDITOR_TMP_COPY_OF = "Npc1"
