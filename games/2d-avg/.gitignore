@@ -1,3 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Placeholder art with third-party IP (e.g. copyrighted character references) —
+# local dev/testing only, never committed
+game/characters/character_1/mario.png
+game/characters/character_1/mario.png.import
