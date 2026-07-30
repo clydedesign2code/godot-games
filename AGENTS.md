@@ -32,7 +32,7 @@ godot-games/
 
 | 目錄 | 引擎版本 | Addons | 主要語言 | 備注 |
 |------|---------|--------|---------|------|
-| `games/2d-avg/` | Godot 4.6 | Dialogic 2.0 | GDScript | 原創冒險遊戲 |
+| `games/2d-avg/` | Godot 4.6 | Dialogic 2.0、Popochiu 2.1.1 | GDScript | 原創冒險遊戲 |
 | `games/udemy-frogger/` | Godot 4 | — | GDScript | Udemy 課程習作，已完成 |
 | `games/udemy-metroid/` | Godot 4 | — | GDScript | Udemy 課程習作，起始包待實作 |
 
@@ -55,6 +55,10 @@ godot-games/
 ---
 
 ## 📜 決策與進度日誌
+
+### 2026-07-10 | Popochiu 2.1.1 安裝（`games/2d-avg/`）
+- **狀態**：addon 已安裝並在 `project.godot` 啟用（`res://addons/popochiu/plugin.cfg` 等 3 個 plugin.cfg）
+- **決策**：Popochiu 本身內建 Room / Character / Inventory / Dialog 系統，與既有自建架構（GameManager / InventoryManager / EventBus + Dialogic 2.0）存在功能重疊；用戶明確選擇「先不整合，僅安裝待評估」——本次僅完成 addon 安裝與啟用，架構整合方向尚未決定，下次動工前需重新與用戶確認方向
 
 ### 2026-06-10 | Udemy 課程專案整合
 - **來源**：`_GodotProjects-udemy/`（外部 repo）→ monorepo
