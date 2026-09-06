@@ -67,11 +67,16 @@ godot-games/
 - **原則**：課程習作與原創遊戲平行存放，不共用資源，res:// 路徑各自獨立
 
 ### 2026-07-20 | Popochiu 最小骨架重建
-- **背景**：`547d620` 安裝 Popochiu v2.1.1 後，開啟編輯器觸發首次設定精靈，自動生成完整 demo（Clyde 角色、BedRoom/Kitchen/GuestRoom 三房、SimpleClickHighRes GUI），與 `DESIGN.md` 定位（Popochiu 僅供「他者時代／靈魂閃回」片段使用）不符
+- **背景**：`547d620` 安裝 Popochiu v2.1.1 後，開啟編輯器觸發首次設定精靈，自動生成完整 demo（Clyde 角色、BedRoom/Kitchen/GuestRoom 三房、SimpleClickHighRes GUI），與 `DESIGN.md` 定位（Popochiu 僅供點擊式調查對話場景使用）不符
 - **決策**：清空 demo 素材（`game/characters`、`game/gui`、`game/rooms`），還原 `c.gd`/`r.gd`/`popochiu_data.cfg`，`project.godot` 僅移除 demo 的 `run/main_scene`，保留 godot_mcp autoloads 與 1920x1080 `canvas_items` 顯示設定（與 demo 無關的既有變更）
 - **完成**：已透過 Popochiu dock 建立最小骨架 `Room1`（`game/rooms/room_1/`）+ `Character1`（`game/characters/character_1/`），GUI 樣板（`game/gui/`，SimpleClickHighRes）為必要框架本體一併生成，非 demo 內容
 - **驗證通過**：房間導航（點擊走動）、Hotspot 觸發對話樹（`TestDialog`）、inventory item 線索追蹤（`Clue`，`I.Clue.add()`）三條技術流程都已跑通。過程中踩到三個坑，已寫進 `.agents/skills/godot_expert/SKILL.md` 的已知陷阱：Popochiu 缺少 Input Map 動作導致點擊無反應、房間裡手動塞角色會變不可互動的幽靈副本、`project.godot` 的 `run/main_scene` 文字編輯不可靠
-- **待辦**：目前 `Room1`/`Character1`/`TestDialog`/`Clue` 都是技術驗證用的占位命名，尚未清理成正式內容。依 `DESIGN.md` 的 Pentiment 式他者時代場次，下一步要決定第一個具體場景/角色，再把這些占位物件替換或擴充為實際內容
+- **待辦**：目前 `Room1`/`Character1`/`TestDialog`/`Clue` 都是技術驗證用的占位命名，尚未清理成正式內容。依 `DESIGN.md` 的雙機制場景語言，下一步要決定第一個正式調查對話場景與角色，再把這些占位物件替換或擴充為實際內容
+
+### 2026-09-06 | 雙機制敘事重新定位
+- **決策**：移除靈魂替換／輪替、前世身份與「他者時代」概念；兩套玩法都發生在同一條故事時間線
+- **機制分工**：自研架構承載鍵盤移動與物理解謎的「環境行動場景」；Popochiu 承載點擊調查、人物對話與線索整理的「調查對話場景」
+- **原則**：玩法切換取決於場景要玩家處理空間壓力還是資訊因果，不代表角色或年代發生替換
 
 ### 2026-05-13 | Monorepo 初始化 + 2D AVG 遷移
 - **決策**：`godot-games` 採 monorepo，每個遊戲放 `games/<name>/`，廢棄 `_Godot_2D_AVG` 獨立 repo
