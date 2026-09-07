@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../_N8N_Agent"
+		},
+		{
+			"path": "../ai-agent-skills"
 		}
 	],
 	"settings": {}
