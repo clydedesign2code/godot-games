@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://ch13brv46ujfk"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u3f3p"]
+
+[node name="Player" type="CharacterBody2D" unique_id=751307688]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1067170112]
+shape = SubResource("CapsuleShape2D_u3f3p")

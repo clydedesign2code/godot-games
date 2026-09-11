@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b2yr2h2xcrc15"]
+
+[ext_resource type="PackedScene" uid="uid://ch13brv46ujfk" path="res://entities/player.tscn" id="1_377w7"]
+[ext_resource type="Script" uid="uid://1ly1v7mj8q08" path="res://entities/player.gd" id="2_bovvr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ftxyw"]
+size = Vector2(561, 383)
+
+[node name="Level" type="Node2D" unique_id=2004411858]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1287989928]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=386945814]
+position = Vector2(344, 286)
+shape = SubResource("RectangleShape2D_ftxyw")
+
+[node name="entities" type="Node2D" parent="." unique_id=1109108153]
+
+[node name="Player" parent="entities" unique_id=751307688 instance=ExtResource("1_377w7")]
+position = Vector2(121, 59)
+script = ExtResource("2_bovvr")
