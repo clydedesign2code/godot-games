@@ -2,6 +2,8 @@
 games/*/.godot/
 **/*.uid
 games/*/export_presets.cfg
+games/guitar-intervals/build/*
+!games/guitar-intervals/build/.gdignore
 
 # Exported builds
 *.apk

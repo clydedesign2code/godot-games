@@ -1,0 +1,10 @@
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M2 Pro
+
+PASS: theory, 96 roots × 12 pitch classes × 2 scopes; four triad qualities
+PASS: PCM pitch spectra, simultaneous voices, four triad qualities, octave register, envelopes and clipping
+PASS: real viewport mouse events, lookup, wrong/retry, hints, reveal, random questions, all triad qualities
+PASS: actual audio bus output, clicked MIDI pitches, dyads, triads, partial chords, mute, volume, score and highlight lifecycle
+PASS: visible interval/chord choices, actual root note, one selected option, full-board placement and practice-safe root editing
+PASS: success feedback, delayed dyad and triad advancement, single scoring, partial/revealed answers and cancellation
+RESULT: 65146 checks, 0 failures

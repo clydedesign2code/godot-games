@@ -36,7 +36,7 @@ godot-games/
 | `games/2d-avg/` | Godot 4.6 | Dialogic 2.0、Popochiu 2.1.1 | GDScript | 原創冒險遊戲 |
 | `games/udemy-frogger/` | Godot 4 | — | GDScript | Udemy 課程習作，已完成 |
 | `games/udemy-metroid/` | Godot 4 | — | GDScript | Udemy 課程習作，起始包待實作 |
-| `games/guitar-intervals/` | Godot 4.6 | — | GDScript | 獨立音程學習工具，附 Noto Sans TC（OFL） |
+| `games/guitar-intervals/` | Godot 4.6 | — | GDScript | 獨立音程學習工具，附 Noto Sans TC／Roboto Mono（OFL） |
 
 ---
 
@@ -61,11 +61,15 @@ godot-games/
 ### 2026-11-05 | 吉他指板相對音程原型
 - **範圍**：使用者選擇先實作可操作原型；另建 `games/guitar-intervals/`，以自身 `project.godot` 執行，不與其他遊戲共用資源
 - **已實作**：標準調弦 0–15 品、任意根音、12 種相對音級查閱、雙音找音、大／小／減／增三和弦補音、範圍限制、位移提示、揭答與當次統計
+- **作答回饋（同日追加）**：完整答對後顯示綠色「答對了！」，約 1.6 秒後自動換題；可手動立即切題。錯答、三和弦尚未選滿與揭答不自動切題；更換模式／設定／題目時取消舊計時
+- **選擇介面（同日追加）**：以平鋪按鈕取代音程／和弦下拉選單；根音欄顯示實際音名／八度與弦品，雙擊指板或按「在指板選根音」指定位置。查閱／雙音／三和弦皆可選根音；雙擊不增加作答或錯答次數。選根音模式顯示全板音名並暫停自動換題；取消保留原題，重按目前已選音程不清除進度
+- **視覺設計（同日追加）**：依使用者指定參考 Teenage Engineering OP–1 field／EP–133，採 FR–12 奶灰機身、深色指板顯示區、等寬標示與獨立鍵帽；橘色根音／主操作、藍色目標音、綠色五度，音程按大小成對排列。共用視覺與鍵帽位於 `src/ui/`，Roboto Mono 隨附 OFL；較窄桌面視窗會上下排列，尚未驗證 iPad 實機。`artifacts/.gdignore` 排除驗證產物匯入
+- **口說讀譜（同日追加）**：新增第四模式，亮單一圓點，接受 A–G 與固定唱名（C＝Do、B＝Si／Ti），含升降／等音；不考歌唱音準。Godot `src/voice/` 負責出題、信心／候選判斷及請求隔離；macOS Swift／Speech／AVAudioEngine 元件由 `tools/build_voice_macos.sh` 建立，首次按下才請求權限，強制裝置端辨識。低信心／權限／模型錯誤不計錯，答對 1.6 秒後切題；提供輸入答案。原生 App 協定與 UI 可自動測試，但真人辨識仍需授權後驗證；iOS 原生橋接尚未實作
 - **判題決策**：第一版採八度等價的相對音級，明示包含低於根音的音；三和弦分三條弦，非空弦跨度最多 4 品；指定方向／八度題型留待後續
-- **聲音（同日追加）**：單音點選試聽、根音／雙音／三和弦同時播放、部分和弦雙音預聽、音量／靜音與發聲位置白圈。查閱預設點音試聽，另用「點選：設根音」指定根音；合奏依實際選定位置發聲，不折回同八度
+- **聲音（同日追加）**：單音點選試聽，圓圈內直接顯示音名／八度，下方顯示弦品位置；根音／雙音／三和弦同時播放並列出各音名、部分和弦雙音預聽、音量／靜音與發聲位置白圈。音名在播放結束後保留供對照，切題清除；平時單擊試聽，雙擊設定根音；合奏依實際選定位置發聲，不折回同八度
 - **技術與依賴**：Godot 4.6.2、GDScript、Control 自繪指板、隨附 Noto Sans TC（SIL OFL）、AudioStreamWAV／AudioStreamPlayer 離線合成撥弦參考音；技能使用 `godot_expert`，CLI 驗證純音樂模型、真實 viewport 點擊、音訊頻譜、AudioEffectCapture 匯流排輸出與 OpenGL 畫面
 - **複用入口**：開啟 `games/guitar-intervals/project.godot` 按 F5；功能規則、測試指令與後續方向見該目錄 `README.md`
-- **未實作**：真實吉他取樣、麥克風、其他調弦／左手模式、進度存檔及平台匯出
+- **未實作／待驗證**：真實吉他取樣、真人口說辨識準確度驗證、iOS 語音橋接、其他調弦／左手模式、進度存檔及平台匯出
 
 ### 2026-07-10 | Popochiu 2.1.1 安裝（`games/2d-avg/`）
 - **狀態**：addon 已安裝並在 `project.godot` 啟用（`res://addons/popochiu/plugin.cfg` 等 3 個 plugin.cfg）
