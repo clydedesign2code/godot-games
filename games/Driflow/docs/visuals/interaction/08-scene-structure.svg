@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040"><rect width="1440" height="1040" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">場景節點與檔案：物件怎麼接進關卡</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">左側是節點關係；右側是要打開或編輯的檔案。省略外觀與碰撞子節點。</text>
+<polyline points="52,974 1388,974" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="1011.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="1011.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<polyline points="100,280 100,535 130,535" fill="none" stroke="#687D90" stroke-width="2"/>
+<polyline points="100,385 130,385" fill="none" stroke="#687D90" stroke-width="2"/>
+<polyline points="160,580 160,685 180,685" fill="none" stroke="#687D90" stroke-width="2"/>
+<polyline points="210,730 210,835 230,835" fill="none" stroke="#687D90" stroke-width="2"/>
+<polyline points="620,235 780,235" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="780,235 770.0950818741205,239.78462087522354 770.0950818741205,230.21537912477646" fill="#687D90"/>
+<polyline points="620,385 780,385" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="780,385 770.0950818741205,389.78462087522354 770.0950818741205,380.21537912477646" fill="#687D90"/>
+<polyline points="620,535 780,535" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="780,535 770.0950818741205,539.7846208752235 770.0950818741205,530.2153791247765" fill="#687D90"/>
+<polyline points="620,685 780,685" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="780,685 770.0950818741205,689.7846208752235 770.0950818741205,680.2153791247765" fill="#687D90"/>
+<polyline points="620,835 780,835" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="780,835 770.0950818741205,839.7846208752235 770.0950818741205,830.2153791247765" fill="#687D90"/>
+<rect x="70" y="190" width="550" height="100" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="202.00" y="229.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">MotionLab (Node2D)</text>
+<text x="290.00" y="270.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">遊戲主場景</text>
+<rect x="130" y="340" width="490" height="100" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="196.25" y="379.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">女偵探 (CharacterBody2D)</text>
+<text x="244.50" y="420.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">由 lab.gd 在 runtime 建立</text>
+<rect x="130" y="490" width="490" height="100" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="264.75" y="529.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">InteractionProps</text>
+<text x="298.00" y="570.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">新增的場景實例</text>
+<rect x="180" y="640" width="440" height="100" rx="16" fill="#FFF3D9" stroke="#C9D6E1"/>
+<text x="274.25" y="679.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">Cabinet (Node2D)</text>
+<text x="312.00" y="720.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">可互動的展示物件</text>
+<rect x="230" y="790" width="390" height="100" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="271.00" y="829.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">Interactable (Node2D)</text>
+<text x="337.00" y="870.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">物件的子節點組件</text>
+<rect x="780" y="190" width="570" height="100" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="959.00" y="229.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">scenes/lab.tscn</text>
+<text x="920.50" y="270.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">主場景新增 InteractionProps</text>
+<rect x="780" y="340" width="570" height="100" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="952.25" y="379.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">scripts/player.gd</text>
+<text x="933.00" y="420.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">主角群組、條件與選單防護</text>
+<rect x="780" y="490" width="570" height="100" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="862.75" y="529.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">scenes/interaction_props.tscn</text>
+<text x="911.00" y="570.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">三種展示物件與 Inspector 設定</text>
+<rect x="780" y="640" width="570" height="100" rx="16" fill="#FFF3D9" stroke="#C9D6E1"/>
+<text x="876.75" y="679.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">scripts/interaction_props.gd</text>
+<text x="904.25" y="720.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">具體反應，連接 interacted 訊號</text>
+<rect x="780" y="790" width="570" height="120" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="874.75" y="839.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">InteractableComponent.gd</text>
+<text x="889.75" y="880.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">options → InteractionOption 資源</text>
+</svg>

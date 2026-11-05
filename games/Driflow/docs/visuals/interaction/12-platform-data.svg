@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960"><rect width="1440" height="960" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">平台調整後，互動物件為什麼仍能對齊？</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">以 lab.gd 的具名常數作為共同資料，避免三份程式各自保存舊座標。</text>
+<polyline points="52,894 1388,894" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="931.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="931.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<rect x="360" y="190" width="720" height="160" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="530.00" y="243.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">scripts/lab.gd：共用平台資料</text>
+<text x="628.25" y="284.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">GROUND_Y = 620</text>
+<text x="522.25" y="315.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">CLIMB_PLATFORM = (500, 415, 160, 20)</text>
+<polyline points="720,350 720,405 250,405 250,480" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="250,480 245.21537912477646,470.0950818741206 254.78462087522354,470.0950818741206" fill="#687D90"/>
+<polyline points="720,350 720,405 720,405 720,480" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,480 715.2153791247765,470.0950818741206 724.7846208752235,470.0950818741206" fill="#687D90"/>
+<polyline points="720,350 720,405 1190,405 1190,480" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="1190,480 1185.2153791247765,470.0950818741206 1194.7846208752235,470.0950818741206" fill="#687D90"/>
+<rect x="50" y="480" width="400" height="190" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="152.00" y="548.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">平台外觀與物理</text>
+<text x="145.75" y="589.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">lab.platform(Rect2)</text>
+<text x="140.00" y="620.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">建立地板、平台與碰撞</text>
+<rect x="520" y="480" width="400" height="190" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="636.00" y="548.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">展示物件位置</text>
+<text x="609.00" y="589.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">interaction_props.gd</text>
+<text x="599.00" y="620.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">櫃子在空地、線索在台面</text>
+<rect x="990" y="480" width="400" height="190" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="1092.00" y="548.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">整合與動作測試</text>
+<text x="1091.00" y="589.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">讀取同一份平台資料</text>
+<text x="1058.00" y="620.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">推算接近、落地與抓邊位置</text>
+<text x="60.00" y="756.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="400" fill="#142B40">本次合併：先偵測到並行修改 → 保留較新平台 → 調整展示物件 → 重跑回歸。</text>
+<text x="60.00" y="810.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#51677B">想手動放置展示物件：關閉 InteractionProps.align_to_lab_platforms。</text>
+</svg>

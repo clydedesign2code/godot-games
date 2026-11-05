@@ -1,0 +1,92 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction_demo.gd" id="1_demo"]
+[ext_resource type="Script" path="res://scripts/interaction/InteractableComponent.gd" id="2_interactable"]
+[ext_resource type="Script" path="res://scripts/interaction/InteractionOption.gd" id="3_option"]
+
+[sub_resource type="Resource" id="Option_look"]
+script = ExtResource("3_option")
+action_id = &"look"
+label = "查看"
+
+[sub_resource type="Resource" id="Option_open"]
+script = ExtResource("3_option")
+action_id = &"open"
+label = "開啟"
+
+[node name="InteractionDemo" type="Node2D"]
+script = ExtResource("1_demo")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Background" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 1920, 0, 1920, 1080, 0, 1080)
+color = Color(0.05, 0.08, 0.12, 1)
+
+[node name="Actor" type="Node2D" parent="." groups=["interaction_actor"]]
+position = Vector2(160, 420)
+
+[node name="Shape" type="Polygon2D" parent="Actor"]
+polygon = PackedVector2Array(-14, -22, 14, -22, 14, 22, -14, 22)
+color = Color(0.45, 0.85, 1, 1)
+
+[node name="Switch" type="Node2D" parent="."]
+position = Vector2(380, 350)
+
+[node name="Shape" type="Polygon2D" parent="Switch"]
+polygon = PackedVector2Array(-20, -20, 20, -20, 20, 20, -20, 20)
+color = Color(0.95, 0.72, 0.3, 1)
+
+[node name="Light" type="Polygon2D" parent="Switch"]
+visible = false
+polygon = PackedVector2Array(-30, -70, 30, -70, 30, -40, -30, -40)
+color = Color(1, 0.95, 0.65, 1)
+
+[node name="Interactable" type="Node2D" parent="Switch"]
+script = ExtResource("2_interactable")
+display_name = "開關（直接反應）"
+interaction_radius = 110.0
+debug_draw_radius = true
+
+[node name="Cabinet" type="Node2D" parent="."]
+position = Vector2(690, 350)
+
+[node name="Shape" type="Polygon2D" parent="Cabinet"]
+polygon = PackedVector2Array(-30, -35, 30, -35, 30, 35, -30, 35)
+color = Color(0.65, 0.5, 0.82, 1)
+
+[node name="Interactable" type="Node2D" parent="Cabinet"]
+script = ExtResource("2_interactable")
+display_name = "櫃子（選單）"
+interaction_radius = 130.0
+response_mode = 1
+options = Array[ExtResource("3_option")]([SubResource("Option_look"), SubResource("Option_open")])
+debug_draw_radius = true
+
+[node name="Clue" type="Node2D" parent="."]
+position = Vector2(1010, 350)
+
+[node name="Shape" type="Polygon2D" parent="Clue"]
+polygon = PackedVector2Array(0, -22, 22, 0, 0, 22, -22, 0)
+color = Color(0.4, 0.9, 0.65, 1)
+
+[node name="Interactable" type="Node2D" parent="Clue"]
+script = ExtResource("2_interactable")
+display_name = "線索（單次互動）"
+interaction_radius = 85.0
+disable_after_use = true
+debug_draw_radius = true
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Instructions" type="Label" parent="UI"]
+offset_left = 48.0
+offset_top = 40.0
+theme_override_font_sizes/font_size = 26
+text = "物件互動測試台\n方向鍵移動藍色方塊，進入圓圈後按 E／手把 Y。\n黃：直接反應　紫：自訂選單　綠：單次互動"
+
+[node name="Result" type="Label" parent="UI"]
+offset_left = 48.0
+offset_top = 570.0
+theme_override_font_sizes/font_size = 24
+text = "走近任一物件開始測試。"

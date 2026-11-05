@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900"><rect width="1440" height="900" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">進入半徑後，究竟選哪個物件？</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">距離從主角根節點（腳底）算到組件位置；以下為示例，兩物件半徑皆為 100 px。</text>
+<polyline points="52,834 1388,834" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="871.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="871.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<rect x="50" y="190" width="650" height="600" rx="16" fill="#FFFFFF" stroke="#C9D6E1"/>
+<text x="78.00" y="246.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">同優先級：選最近</text>
+<circle cx="320" cy="460" r="150" fill="none" stroke="#087F8C" stroke-width="3"/>
+<circle cx="380" cy="460" r="150" fill="none" stroke="#7855B7" stroke-width="1"/>
+<circle cx="260" cy="408" r="13" fill="#EAF1FC" stroke="#316AC5" stroke-width="2"/>
+<polyline points="260,422 260,450 246,460 260,450 274,460" fill="none" stroke="#316AC5" stroke-width="4"/>
+<circle cx="260" cy="460" r="5" fill="#EAF1FC" stroke="#316AC5" stroke-width="2"/>
+<rect x="310" y="450" width="20" height="20" rx="3" fill="#E6F5F3" stroke="#087F8C"/>
+<rect x="370" y="450" width="20" height="20" rx="3" fill="#F0EBF9" stroke="#7855B7"/>
+<text x="212.00" y="514.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#316AC5">主角</text>
+<text x="316.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="600" fill="#087F8C">A</text>
+<text x="376.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="600" fill="#7855B7">B</text>
+<text x="78.00" y="675.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#142B40">A：40 px／priority 0</text>
+<text x="78.00" y="718.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#142B40">B：80 px／priority 0</text>
+<rect x="435" y="657" width="230" height="100" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="522.25" y="696.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">選 A</text>
+<text x="528.00" y="737.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">最近</text>
+<rect x="750" y="190" width="650" height="600" rx="16" fill="#FFFFFF" stroke="#C9D6E1"/>
+<text x="778.00" y="246.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">優先級不同：先比優先級</text>
+<circle cx="1020" cy="460" r="150" fill="none" stroke="#087F8C" stroke-width="1"/>
+<circle cx="1080" cy="460" r="150" fill="none" stroke="#7855B7" stroke-width="3"/>
+<circle cx="960" cy="408" r="13" fill="#EAF1FC" stroke="#316AC5" stroke-width="2"/>
+<polyline points="960,422 960,450 946,460 960,450 974,460" fill="none" stroke="#316AC5" stroke-width="4"/>
+<circle cx="960" cy="460" r="5" fill="#EAF1FC" stroke="#316AC5" stroke-width="2"/>
+<rect x="1010" y="450" width="20" height="20" rx="3" fill="#E6F5F3" stroke="#087F8C"/>
+<rect x="1070" y="450" width="20" height="20" rx="3" fill="#F0EBF9" stroke="#7855B7"/>
+<text x="912.00" y="514.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#316AC5">主角</text>
+<text x="1016.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="600" fill="#087F8C">A</text>
+<text x="1076.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="600" fill="#7855B7">B</text>
+<text x="778.00" y="675.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#142B40">A：40 px／priority 0</text>
+<text x="778.00" y="718.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#142B40">B：80 px／priority 2</text>
+<rect x="1135" y="657" width="230" height="100" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="1224.50" y="696.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">選 B</text>
+<text x="1184.00" y="737.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">高優先級優先</text>
+</svg>

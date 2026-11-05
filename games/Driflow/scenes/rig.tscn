@@ -1,0 +1,275 @@
+[gd_scene load_steps=14 format=3]
+[ext_resource type="Script" path="res://scripts/rig.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/coat_upper.svg" id="2"]
+[ext_resource type="Texture2D" path="res://art/head.svg" id="3"]
+[ext_resource type="Texture2D" path="res://art/hat.svg" id="4"]
+[ext_resource type="Texture2D" path="res://art/upper_arm.svg" id="5"]
+[ext_resource type="Texture2D" path="res://art/forearm.svg" id="6"]
+[ext_resource type="Texture2D" path="res://art/thigh.svg" id="7"]
+[ext_resource type="Texture2D" path="res://art/shin.svg" id="8"]
+[ext_resource type="Texture2D" path="res://art/boot.svg" id="9"]
+[ext_resource type="Texture2D" path="res://art/ponytail.svg" id="10"]
+[ext_resource type="Texture2D" path="res://art/ponytail_tip.svg" id="11"]
+[ext_resource type="Texture2D" path="res://art/coat_lower.svg" id="12"]
+[ext_resource type="Texture2D" path="res://art/hand.svg" id="13"]
+[node name="DetectiveRig" type="Node2D"]
+script = ExtResource("1")
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+[node name="Hip" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(0,-60)
+rest = Transform2D(1,0,0,1,0,-60)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="BackThigh" type="Bone2D" parent="Skeleton2D/Hip"]
+position = Vector2(-5,0)
+rest = Transform2D(1,0,0,1,-5,0)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/BackThigh"]
+z_index = 1
+texture = ExtResource("7")
+position = Vector2(0,13.5)
+[node name="BackShin" type="Bone2D" parent="Skeleton2D/Hip/BackThigh"]
+position = Vector2(0,25)
+rest = Transform2D(1,0,0,1,0,25)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/BackThigh/BackShin"]
+z_index = 1
+texture = ExtResource("8")
+position = Vector2(0,13.0)
+[node name="BackBoot" type="Bone2D" parent="Skeleton2D/Hip/BackThigh/BackShin"]
+position = Vector2(0,23)
+rest = Transform2D(1,0,0,1,0,23)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/BackThigh/BackShin/BackBoot"]
+z_index = 1
+texture = ExtResource("9")
+position = Vector2(0,6.5)
+[node name="Spine" type="Bone2D" parent="Skeleton2D/Hip"]
+position = Vector2(0,-8)
+rest = Transform2D(1,0,0,1,0,-8)
+auto_calculate_length_and_angle = false
+length = 26.0
+bone_angle = -1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine"]
+z_index = 4
+texture = ExtResource("12")
+position = Vector2(0,9)
+[node name="Torso" type="Bone2D" parent="Skeleton2D/Hip/Spine"]
+position = Vector2(0,-26)
+rest = Transform2D(1,0,0,1,0,-26)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso"]
+z_index = 4
+texture = ExtResource("2")
+position = Vector2(0,14.0)
+[node name="BackShoulder" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso"]
+position = Vector2(-7,5)
+rest = Transform2D(1,0,0,1,-7,5)
+auto_calculate_length_and_angle = false
+length = 7.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder"]
+z_index = 0
+texture = ExtResource("5")
+position = Vector2(0,2)
+scale = Vector2(0.7,0.3)
+[node name="BackArm" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder"]
+position = Vector2(0,0)
+rest = Transform2D(1,0,0,1,0,0)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm"]
+z_index = 0
+texture = ExtResource("5")
+position = Vector2(0,12.5)
+[node name="BackForearm" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm"]
+position = Vector2(0,22)
+rest = Transform2D(1,0,0,1,0,22)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm"]
+z_index = 0
+texture = ExtResource("6")
+position = Vector2(0,13.5)
+[node name="Neck" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso"]
+position = Vector2(0,-10)
+rest = Transform2D(1,0,0,1,0,-10)
+auto_calculate_length_and_angle = false
+length = 17.0
+bone_angle = -1.570796
+[node name="Head" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/Neck"]
+position = Vector2(0,-17)
+rest = Transform2D(1,0,0,1,0,-17)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head"]
+z_index = 5
+texture = ExtResource("3")
+position = Vector2(0,21.0)
+[node name="Hat" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head"]
+position = Vector2(-3,-8)
+rest = Transform2D(1,0,0,1,-3,-8)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head/Hat"]
+z_index = 6
+texture = ExtResource("4")
+position = Vector2(0,12.5)
+[node name="FrontThigh" type="Bone2D" parent="Skeleton2D/Hip"]
+position = Vector2(5,0)
+rest = Transform2D(1,0,0,1,5,0)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/FrontThigh"]
+z_index = 3
+texture = ExtResource("7")
+position = Vector2(0,13.5)
+[node name="FrontShin" type="Bone2D" parent="Skeleton2D/Hip/FrontThigh"]
+position = Vector2(0,25)
+rest = Transform2D(1,0,0,1,0,25)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin"]
+z_index = 3
+texture = ExtResource("8")
+position = Vector2(0,13.0)
+[node name="FrontBoot" type="Bone2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin"]
+position = Vector2(0,23)
+rest = Transform2D(1,0,0,1,0,23)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin/FrontBoot"]
+z_index = 3
+texture = ExtResource("9")
+position = Vector2(0,6.5)
+[node name="FrontShoulder" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso"]
+position = Vector2(9,5)
+rest = Transform2D(1,0,0,1,9,5)
+auto_calculate_length_and_angle = false
+length = 7.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder"]
+z_index = 7
+texture = ExtResource("5")
+position = Vector2(0,2)
+scale = Vector2(0.7,0.3)
+[node name="FrontArm" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder"]
+position = Vector2(0,0)
+rest = Transform2D(1,0,0,1,0,0)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm"]
+z_index = 7
+texture = ExtResource("5")
+position = Vector2(0,12.5)
+[node name="FrontForearm" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm"]
+position = Vector2(0,22)
+rest = Transform2D(1,0,0,1,0,22)
+auto_calculate_length_and_angle = false
+length = 22.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm"]
+z_index = 7
+texture = ExtResource("6")
+position = Vector2(0,13.5)
+
+[node name="Ponytail" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head"]
+position = Vector2(-16,15)
+rest = Transform2D(1,0,0,1,-16,15)
+auto_calculate_length_and_angle = false
+length = 20.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head/Ponytail"]
+z_index = 2
+texture = ExtResource("10")
+position = Vector2(-5,11)
+[node name="Tip" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head/Ponytail"]
+position = Vector2(-5,20)
+rest = Transform2D(1,0,0,1,-5,20)
+auto_calculate_length_and_angle = false
+length = 20.0
+bone_angle = 1.570796
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/Neck/Head/Ponytail/Tip"]
+z_index = 2
+texture = ExtResource("11")
+position = Vector2(0,9)
+
+[node name="HandContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm"]
+position = Vector2(0,27)
+
+[node name="SoleContact" type="Marker2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin/FrontBoot"]
+position = Vector2(0,13)
+
+[node name="HandContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm"]
+position = Vector2(0,27)
+
+[node name="SoleContact" type="Marker2D" parent="Skeleton2D/Hip/BackThigh/BackShin/BackBoot"]
+position = Vector2(0,13)
+
+[node name="CoatJoin" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso"]
+position = Vector2(0,26)
+
+[node name="FrontHand" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm"]
+position = Vector2(0,27)
+rest = Transform2D(1,0,0,1,0,27)
+auto_calculate_length_and_angle = false
+length = 8.0
+bone_angle = 0.0
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm/FrontHand"]
+z_index = 7
+texture = ExtResource("13")
+position = Vector2(1,1)
+[node name="KneeContact" type="Marker2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin"]
+position = Vector2(5,0)
+
+[node name="BackHand" type="Bone2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm"]
+position = Vector2(0,27)
+rest = Transform2D(1,0,0,1,0,27)
+auto_calculate_length_and_angle = false
+length = 8.0
+bone_angle = 0.0
+[node name="Artwork" type="Sprite2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm/BackHand"]
+z_index = 0
+texture = ExtResource("13")
+position = Vector2(1,1)
+[node name="KneeContact" type="Marker2D" parent="Skeleton2D/Hip/BackThigh/BackShin"]
+position = Vector2(5,0)
+
+[node name="WristContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm"]
+position = Vector2(0,27)
+[node name="PalmContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/FrontShoulder/FrontArm/FrontForearm/FrontHand"]
+position = Vector2(0,4)
+
+[node name="WristContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm"]
+position = Vector2(0,27)
+[node name="PalmContact" type="Marker2D" parent="Skeleton2D/Hip/Spine/Torso/BackShoulder/BackArm/BackForearm/BackHand"]
+position = Vector2(0,4)
+
+[node name="ToeContact" type="Marker2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin/FrontBoot"]
+position = Vector2(12,13)
+
+[node name="ToeContact" type="Marker2D" parent="Skeleton2D/Hip/BackThigh/BackShin/BackBoot"]
+position = Vector2(12,13)
+
+[node name="HeelContact" type="Marker2D" parent="Skeleton2D/Hip/FrontThigh/FrontShin/FrontBoot"]
+position = Vector2(-12,13)
+
+[node name="HeelContact" type="Marker2D" parent="Skeleton2D/Hip/BackThigh/BackShin/BackBoot"]
+position = Vector2(-12,13)

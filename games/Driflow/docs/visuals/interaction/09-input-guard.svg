@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="930" viewBox="0 0 1440 930"><rect width="1440" height="930" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">A 按鈕確認選單，為什麼不會順便跳躍？</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">GUI 消耗事件不會清除 Input 輪詢；角色控制器必須隔離關閉當幀的動作。</text>
+<polyline points="52,864 1388,864" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="901.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="901.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<text x="190.00" y="235.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">選單開啟</text>
+<rect x="50" y="310" width="400" height="120" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="136.00" y="359.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">UI 接收方向與確認</text>
+<text x="185.25" y="400.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">UI／事件路徑</text>
+<rect x="50" y="510" width="400" height="170" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="96.00" y="564.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">清零水平移動與跳躍緩衝</text>
+<text x="82.00" y="603.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">保留重力、碰撞與姿勢更新</text>
+<text x="173.00" y="644.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">角色／物理路徑</text>
+<polyline points="450,370 520,370" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="520,370 510.0950818741206,374.78462087522354 510.0950818741206,365.21537912477646" fill="#687D90"/>
+<polyline points="450,595 520,595" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="520,595 510.0950818741206,599.7846208752235 510.0950818741206,590.2153791247765" fill="#687D90"/>
+<polyline points="250,430 250,510" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="250,510 245.21537912477646,500.0950818741206 254.78462087522354,500.0950818741206" fill="#687D90"/>
+<text x="656.50" y="235.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">按 A 確認</text>
+<rect x="520" y="310" width="400" height="120" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="587.00" y="359.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">選定選項 → 關閉選單</text>
+<text x="655.25" y="400.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">UI／事件路徑</text>
+<rect x="520" y="510" width="400" height="170" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="580.00" y="564.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">額外隔離一次物理更新</text>
+<text x="553.25" y="603.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">避免同一個 A 被當成 jump</text>
+<text x="643.00" y="644.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">角色／物理路徑</text>
+<polyline points="920,370 990,370" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="990,370 980.0950818741205,374.78462087522354 980.0950818741205,365.21537912477646" fill="#687D90"/>
+<polyline points="920,595 990,595" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="990,595 980.0950818741205,599.7846208752235 980.0950818741205,590.2153791247765" fill="#687D90"/>
+<polyline points="720,430 720,510" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,510 715.2153791247765,500.0950818741206 724.7846208752235,500.0950818741206" fill="#687D90"/>
+<text x="1085.00" y="235.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">下一次正常更新</text>
+<rect x="990" y="310" width="400" height="120" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="1120.00" y="359.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">選單已關閉</text>
+<text x="1125.25" y="400.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">UI／事件路徑</text>
+<rect x="990" y="510" width="400" height="170" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="1064.00" y="564.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">恢復一般移動與跳躍</text>
+<text x="1036.00" y="603.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">跳躍不沿用選單確認事件</text>
+<text x="1113.00" y="644.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">角色／物理路徑</text>
+<polyline points="1190,430 1190,510" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="1190,510 1185.2153791247765,500.0950818741206 1194.7846208752235,500.0950818741206" fill="#687D90"/>
+<text x="60.00" y="781.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="400" fill="#142B40">實作位置：player.gd 的 menu_state_changed 回呼與 _interaction_input_guard</text>
+<text x="60.00" y="830.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#51677B">效果：可以確認選項，同時避免跳躍緩衝或水平移動從選單滲入遊戲。</text>
+</svg>

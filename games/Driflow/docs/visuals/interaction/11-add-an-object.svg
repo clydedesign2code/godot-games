@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120"><rect width="1440" height="1120" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">新增一個物件：只接四個地方</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">右側是欄位對照示意，並非 Godot 編輯器截圖；數值是範例。</text>
+<polyline points="52,1054 1388,1054" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="1091.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="1091.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<rect x="60" y="210" width="440" height="140" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="209.25" y="269.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">1  主角註冊</text>
+<text x="83.50" y="310.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">主角根節點加入 interaction_actor 群組</text>
+<polyline points="280,350 280,400" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="280,400 275.21537912477646,390.0950818741206 284.78462087522354,390.0950818741206" fill="#687D90"/>
+<rect x="60" y="400" width="440" height="140" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="209.25" y="443.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">2  加入組件</text>
+<text x="177.75" y="484.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">物件下加入 Node2D</text>
+<text x="105.25" y="515.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">掛上 InteractableComponent.gd</text>
+<polyline points="280,540 280,590" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="280,590 275.21537912477646,580.0950818741205 284.78462087522354,580.0950818741205" fill="#687D90"/>
+<rect x="60" y="590" width="440" height="140" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="167.25" y="633.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">3  設定模式與選項</text>
+<text x="194.75" y="674.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">DIRECT 或 MENU</text>
+<text x="138.25" y="705.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">選項使用 InteractionOption</text>
+<polyline points="280,730 280,780" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="280,780 275.21537912477646,770.0950818741205 284.78462087522354,770.0950818741205" fill="#687D90"/>
+<rect x="60" y="780" width="440" height="140" rx="16" fill="#FFF3D9" stroke="#C9D6E1"/>
+<text x="181.25" y="839.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">4  接上具體反應</text>
+<text x="82.00" y="880.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">連接 interacted(actor, action_id) 訊號</text>
+<polyline points="500,660 590,660" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="590,660 580.0950818741205,664.7846208752235 580.0950818741205,655.2153791247765" fill="#687D90"/>
+<rect x="590" y="210" width="790" height="770" rx="16" fill="#FFFFFF" stroke="#C9D6E1"/>
+<text x="620.00" y="270.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="30" font-weight="600" fill="#142B40">InteractableComponent 欄位對照</text>
+<text x="620.00" y="340.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">interaction_radius</text>
+<text x="1110.00" y="340.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">96 px</text>
+<text x="620.00" y="376.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">互動半徑，世界像素</text>
+<polyline points="620,394 1350,394" fill="none" stroke="#C9D6E1" stroke-width="2"/>
+<text x="620.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">priority</text>
+<text x="1110.00" y="436.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">0</text>
+<text x="620.00" y="472.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">同級取最近者</text>
+<polyline points="620,490 1350,490" fill="none" stroke="#C9D6E1" stroke-width="2"/>
+<text x="620.00" y="532.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">response_mode</text>
+<text x="1110.00" y="532.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">MENU</text>
+<text x="620.00" y="568.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">開選單或直接反應</text>
+<polyline points="620,586 1350,586" fill="none" stroke="#C9D6E1" stroke-width="2"/>
+<text x="620.00" y="628.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">options</text>
+<text x="1110.00" y="628.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">look / open</text>
+<text x="620.00" y="664.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">每個選項使用唯一 ID</text>
+<polyline points="620,682 1350,682" fill="none" stroke="#C9D6E1" stroke-width="2"/>
+<text x="620.00" y="724.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">disable_after_use</text>
+<text x="1110.00" y="724.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">true / false</text>
+<text x="620.00" y="760.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">是否單次使用</text>
+<polyline points="620,778 1350,778" fill="none" stroke="#C9D6E1" stroke-width="2"/>
+<text x="620.00" y="820.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="600" fill="#142B40">show_prompt</text>
+<text x="1110.00" y="820.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#7855B7">true</text>
+<text x="620.00" y="856.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="23" font-weight="400" fill="#51677B">是否顯示動作提示</text>
+<text x="620.00" y="940.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="25" font-weight="400" fill="#A16A11">實際反應寫在物件腳本，不塞入管理器。</text>
+</svg>

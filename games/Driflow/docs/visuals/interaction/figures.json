@@ -1,0 +1,76 @@
+{
+  "captions": {
+    "01-switch-response": "實際遊戲畫面：主角在開關範圍內互動，黃色燈亮起；反應直接執行，不開選單。",
+    "02-proximity-prompt": "實際遊戲畫面：女偵探走近櫃子後，出現 E 動作提示；此時尚未執行櫃子反應。",
+    "03-cabinet-menu": "實際遊戲畫面：按動作鍵後開啟櫃子選單，玩家可查看、開啟或取消；背景仍維持原關卡。",
+    "04-menu-response": "實際遊戲畫面：選擇「開啟」後選單關閉，畫面顯示櫃子的具體反應；角色可恢復操作。",
+    "05-interaction-flow": "概念圖：按鍵 → 重新選擇有效目標 → 直接反應或選單 → 最後驗證 → 發送物件反應訊號。",
+    "06-responsibility-map": "結構圖：管理器、主角、互動組件、選項資源與物件反應的責任邊界。訊號由組件發送，選項資源只提供資料。",
+    "07-distance-priority": "距離示意：兩個物件都在範圍內時，同級選最近；較高 priority 可以優先於較近物件。示例半徑均為 100 px。",
+    "08-scene-structure": "結構圖：場景節點與應編輯的檔案對照；角色由 lab.gd 在 runtime 建立，展示物件以場景實例加入。",
+    "09-input-guard": "輸入時序：選單開啟、A 確認關閉、恢復操作三個階段；額外隔離一次物理輸入，避免確認同時觸發 jump。",
+    "10-interaction-lifecycle": "狀態圖：範圍外、就緒、選單、反應與一次性禁用。一次性物件在發出反應訊號前已先禁用。",
+    "11-add-an-object": "操作示意：主角群組 → 加入組件 → 設定模式與選項 → 連接反應。欄位面板是對照示意，不是編輯器截圖。",
+    "12-platform-data": "資料依賴圖：平台、展示物件與測試讀取同一份 lab.gd 平台常數；保留另一個對話更新的幾何配置。",
+    "13-verification-map": "驗證範圍：42 項互動核心、21 項女偵探整合，以及另外執行的原動作回歸；不等同正式美術驗收。"
+  },
+  "log_placements": {
+    "## 成果與適用範圍": [
+      "03-cabinet-menu"
+    ],
+    "## 需求與設計決策": [
+      "05-interaction-flow",
+      "07-distance-priority"
+    ],
+    "## 程式與文件結構": [
+      "06-responsibility-map",
+      "08-scene-structure"
+    ],
+    "## 角色控制整合與輸入": [
+      "09-input-guard",
+      "10-interaction-lifecycle"
+    ],
+    "## 三個可試玩的展示物件": [
+      "01-switch-response",
+      "02-proximity-prompt",
+      "04-menu-response"
+    ],
+    "## 與另一個對話併行修改的處理": [
+      "12-platform-data"
+    ],
+    "## 實際驗證與證據": [
+      "13-verification-map"
+    ],
+    "## 如何繼續修改": [
+      "11-add-an-object"
+    ]
+  },
+  "guide_placements": {
+    "## 1. 專案與文件結構": [
+      "08-scene-structure"
+    ],
+    "## 2. 執行關係與責任": [
+      "06-responsibility-map"
+    ],
+    "## 距離式物件互動補充": [
+      "03-cabinet-menu"
+    ],
+    "### 修改入口": [
+      "11-add-an-object"
+    ],
+    "### 操作與狀態規則": [
+      "05-interaction-flow",
+      "07-distance-priority",
+      "09-input-guard",
+      "10-interaction-lifecycle"
+    ],
+    "### 文件、驗證與限制": [
+      "12-platform-data",
+      "13-verification-map"
+    ]
+  },
+  "pages": {
+    "devlog": "https://app.notion.com/p/40fc42073e3381089418ff23b6833ac7",
+    "guide": "https://app.notion.com/p/40fc42073e3381db838cf7b1696b274a"
+  }
+}

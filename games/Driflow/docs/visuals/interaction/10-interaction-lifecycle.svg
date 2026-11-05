@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000"><rect width="1440" height="1000" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">物件與選單的生命週期</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">可重複物件回到就緒；一次性線索在成功反應前先禁用，防止重入。</text>
+<polyline points="52,934 1388,934" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="971.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="971.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<polyline points="380,285 560,285" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="560,285 550.0950818741205,289.78462087522354 550.0950818741205,280.21537912477646" fill="#687D90"/>
+<text x="395.00" y="262.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">進入範圍</text>
+<polyline points="560,315 380,315" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="380,315 389.9049181258794,310.21537912477646 389.9049181258794,319.78462087522354" fill="#687D90"/>
+<text x="390.00" y="357.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">離開／失效</text>
+<polyline points="880,285 1040,285" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="1040,285 1030.0950818741205,289.78462087522354 1030.0950818741205,280.21537912477646" fill="#687D90"/>
+<text x="920.00" y="262.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">MENU</text>
+<polyline points="720,350 720,460" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,460 715.2153791247765,450.0950818741206 724.7846208752235,450.0950818741206" fill="#687D90"/>
+<text x="745.00" y="417.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">DIRECT</text>
+<polyline points="1190,350 1190,510 880,510" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="880,510 889.9049181258795,505.21537912477646 889.9049181258795,514.7846208752235" fill="#687D90"/>
+<text x="1000.00" y="472.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">選定有效選項</text>
+<polyline points="1040,315 960,315 960,200 720,200 720,240" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,240 715.2153791247765,230.09508187412055 724.7846208752235,230.09508187412055" fill="#687D90"/>
+<text x="835.00" y="182.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">取消</text>
+<polyline points="560,510 480,510 480,390 620,390 620,350" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="620,350 624.7846208752235,359.9049181258794 615.2153791247765,359.9049181258794" fill="#687D90"/>
+<text x="335.00" y="467.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">一般物件</text>
+<polyline points="720,570 720,700" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,700 715.2153791247765,690.0950818741205 724.7846208752235,690.0950818741205" fill="#687D90"/>
+<text x="760.00" y="642.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">單次使用：發訊號前先禁用</text>
+<rect x="80" y="240" width="300" height="129" rx="16" fill="#EDF2F6" stroke="#C9D6E1"/>
+<text x="174.00" y="278.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">不可互動</text>
+<text x="164.00" y="319.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">範圍外／停用</text>
+<text x="153.00" y="350.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">或主角狀態不符</text>
+<rect x="560" y="240" width="320" height="110" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="622.00" y="284.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">就緒：目前目標</text>
+<text x="643.00" y="325.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">有效且在範圍內</text>
+<rect x="1040" y="240" width="300" height="110" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="1134.00" y="284.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">選單開啟</text>
+<text x="1091.00" y="325.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">持續驗證距離與目標</text>
+<rect x="560" y="460" width="320" height="110" rx="16" fill="#FFF3D9" stroke="#C9D6E1"/>
+<text x="636.00" y="504.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">執行物件反應</text>
+<text x="614.25" y="545.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">發出 interacted 訊號</text>
+<rect x="560" y="700" width="320" height="110" rx="16" fill="#EDF2F6" stroke="#C9D6E1"/>
+<text x="636.00" y="744.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">已使用：禁用</text>
+<text x="599.00" y="785.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">外觀與存檔由回呼另處理</text>
+<text x="60.00" y="891.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="400" fill="#142B40">任何時候刪除主角／物件／場景：關閉殘留選單並清除目標，不沿用舊參照。</text>
+</svg>

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://5jwqkro26yss"]
+
+[ext_resource type="Script" uid="uid://c0ngorp7omtd3" path="res://scripts/lab.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/interaction_props.tscn" id="2_interaction"]
+
+[node name="MotionLab" type="Node2D" unique_id=302948171]
+script = ExtResource("1")
+
+[node name="InteractionProps" parent="." instance=ExtResource("2_interaction")]

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000"><rect width="1440" height="1000" fill="#F5F8FB"/>
+<text x="52.00" y="76.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="40" font-weight="600" fill="#142B40">程式怎麼分工：管理器、組件、反應</text>
+<text x="54.00" y="120.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="24" font-weight="400" fill="#51677B">箭頭表示呼叫或訊號；三個核心腳本不依賴特定角色與對話 addon。</text>
+<polyline points="52,934 1388,934" fill="none" stroke="#C9D6E1" stroke-width="1"/>
+<text x="54.00" y="971.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">DRIFLOW / INTERACTION SYSTEM</text>
+<text x="1115.00" y="971.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="18" font-weight="400" fill="#51677B">概念圖 · 2026-11-05</text>
+<polyline points="410,280 540,280" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="540,280 530.0950818741205,284.78462087522354 530.0950818741205,275.21537912477646" fill="#687D90"/>
+<text x="422.00" y="262.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">主角群組</text>
+<polyline points="900,280 1030,280" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="1030,280 1020.0950818741205,284.78462087522354 1020.0950818741205,275.21537912477646" fill="#687D90"/>
+<text x="905.00" y="262.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">查詢／啟動</text>
+<polyline points="720,350 720,460" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="720,460 715.2153791247765,450.0950818741206 724.7846208752235,450.0950818741206" fill="#687D90"/>
+<text x="745.00" y="417.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">顯示目標與選單</text>
+<polyline points="540,315 475,315 475,520 410,520" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="410,520 419.9049181258794,515.2153791247765 419.9049181258794,524.7846208752235" fill="#687D90"/>
+<text x="420.00" y="430.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">選單狀態訊號</text>
+<polyline points="1200,480 1200,350" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="1200,350 1204.7846208752235,359.9049181258794 1195.2153791247765,359.9049181258794" fill="#687D90"/>
+<text x="1220.00" y="422.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">選項資料</text>
+<polyline points="1370,300 1390,300 1390,750 900,750" fill="none" stroke="#687D90" stroke-width="2"/>
+<polygon points="900,750 909.9049181258795,745.2153791247765 909.9049181258795,754.7846208752235" fill="#687D90"/>
+<text x="1020.00" y="717.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">interacted 訊號</text>
+<rect x="70" y="210" width="340" height="140" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="174.50" y="269.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">player.gd</text>
+<text x="98.50" y="310.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">群組與 can_interact() hook</text>
+<rect x="540" y="210" width="360" height="140" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="583.50" y="269.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">InteractionManager</text>
+<text x="577.00" y="310.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">單一輸入入口、選定互動目標</text>
+<rect x="1030" y="210" width="340" height="140" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="1116.00" y="253.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">互動物件組件</text>
+<text x="1068.00" y="294.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">InteractableComponent</text>
+<text x="1101.00" y="325.50" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">距離、模式、可用性</text>
+<rect x="70" y="460" width="340" height="140" rx="16" fill="#EAF1FC" stroke="#C9D6E1"/>
+<text x="156.00" y="519.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">角色輸入防護</text>
+<text x="108.00" y="560.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">鎖住移動／跳躍，保留物理</text>
+<rect x="540" y="460" width="360" height="140" rx="16" fill="#E6F5F3" stroke="#C9D6E1"/>
+<text x="634.00" y="519.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">提示與選單 UI</text>
+<text x="599.50" y="560.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">Control／CanvasLayer</text>
+<rect x="1030" y="480" width="340" height="130" rx="16" fill="#F0EBF9" stroke="#C9D6E1"/>
+<text x="1079.50" y="534.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">InteractionOption</text>
+<text x="1076.50" y="575.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">動作 ID、文字、啟用設定</text>
+<rect x="540" y="690" width="360" height="140" rx="16" fill="#FFF3D9" stroke="#C9D6E1"/>
+<text x="594.00" y="749.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="28" font-weight="600" fill="#142B40">物件自己的反應腳本</text>
+<text x="576.00" y="790.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="22" font-weight="400" fill="#51677B">範例：interaction_props.gd</text>
+<text x="70.00" y="876.00" font-family="Heiti TC,STHeiti,PingFang TC,sans-serif" font-size="26" font-weight="400" fill="#142B40">改反應 → 找物件腳本　　改距離 → 找組件　　改選目標／UI → 找管理器</text>
+</svg>
