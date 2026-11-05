@@ -30,6 +30,7 @@
 | 遊戲 | 路徑 | 技術棧 | 狀態 |
 |------|------|--------|------|
 | 2D AVG（像素解謎冒險）| `games/2d-avg/` | Godot 4 + Dialogic 2.0 | 架構完成，待美術 |
+| 吉他指板相對音程 | `games/guitar-intervals/` | Godot 4.6，無 addons | 查閱、雙音、三和弦可操作原型；詳見專案 README |
 
 ---
 

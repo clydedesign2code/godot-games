@@ -20,7 +20,8 @@ godot-games/
 ├── games/            ← 各遊戲獨立子目錄，每個子目錄都是完整 Godot 專案
 │   ├── 2d-avg/         ← 2D 像素解謎冒險（原 _Godot_2D_AVG）
 │   ├── udemy-frogger/  ← Udemy 課程：Frogger 複製版（已完成）
-│   └── udemy-metroid/  ← Udemy 課程：Metroid-like（起始包，待實作）
+│   ├── udemy-metroid/  ← Udemy 課程：Metroid-like（起始包，待實作）
+│   └── guitar-intervals/ ← 吉他指板相對音程學習（查閱／雙音／三和弦原型）
 └── shared/           ← 預留跨遊戲共用資源
 ```
 
@@ -35,6 +36,7 @@ godot-games/
 | `games/2d-avg/` | Godot 4.6 | Dialogic 2.0、Popochiu 2.1.1 | GDScript | 原創冒險遊戲 |
 | `games/udemy-frogger/` | Godot 4 | — | GDScript | Udemy 課程習作，已完成 |
 | `games/udemy-metroid/` | Godot 4 | — | GDScript | Udemy 課程習作，起始包待實作 |
+| `games/guitar-intervals/` | Godot 4.6 | — | GDScript | 獨立音程學習工具，附 Noto Sans TC（OFL） |
 
 ---
 
@@ -55,6 +57,15 @@ godot-games/
 ---
 
 ## 📜 決策與進度日誌
+
+### 2026-11-05 | 吉他指板相對音程原型
+- **範圍**：使用者選擇先實作可操作原型；另建 `games/guitar-intervals/`，以自身 `project.godot` 執行，不與其他遊戲共用資源
+- **已實作**：標準調弦 0–15 品、任意根音、12 種相對音級查閱、雙音找音、大／小／減／增三和弦補音、範圍限制、位移提示、揭答與當次統計
+- **判題決策**：第一版採八度等價的相對音級，明示包含低於根音的音；三和弦分三條弦，非空弦跨度最多 4 品；指定方向／八度題型留待後續
+- **聲音（同日追加）**：單音點選試聽、根音／雙音／三和弦同時播放、部分和弦雙音預聽、音量／靜音與發聲位置白圈。查閱預設點音試聽，另用「點選：設根音」指定根音；合奏依實際選定位置發聲，不折回同八度
+- **技術與依賴**：Godot 4.6.2、GDScript、Control 自繪指板、隨附 Noto Sans TC（SIL OFL）、AudioStreamWAV／AudioStreamPlayer 離線合成撥弦參考音；技能使用 `godot_expert`，CLI 驗證純音樂模型、真實 viewport 點擊、音訊頻譜、AudioEffectCapture 匯流排輸出與 OpenGL 畫面
+- **複用入口**：開啟 `games/guitar-intervals/project.godot` 按 F5；功能規則、測試指令與後續方向見該目錄 `README.md`
+- **未實作**：真實吉他取樣、麥克風、其他調弦／左手模式、進度存檔及平台匯出
 
 ### 2026-07-10 | Popochiu 2.1.1 安裝（`games/2d-avg/`）
 - **狀態**：addon 已安裝並在 `project.godot` 啟用（`res://addons/popochiu/plugin.cfg` 等 3 個 plugin.cfg）
