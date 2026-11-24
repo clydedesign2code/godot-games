@@ -50,6 +50,8 @@ func _click_at(point: Vector2, double_click: bool = false) -> void:
 
 
 func _click(control: Control) -> void:
+	if control is Button and not control.is_visible_in_tree() and control in app.mode_buttons:
+		await _click(app.practice_nav_button)
 	var ancestor: Node = control.get_parent()
 	while ancestor != null:
 		if ancestor is ScrollContainer:
@@ -104,8 +106,8 @@ func _theory_tests() -> void:
 	_check(Theory.spelled_note(c_root, 8, 5) == "A♭", "Minor sixth spelled A flat")
 	_check(Theory.spelled_note(Vector2i(4, 4), 4, 2) == "E♯", "C sharp major uses E sharp")
 	_check(Theory.spelled_note(Vector2i(3, 6), 6, 4) == "E♭♭", "A flat diminished fifth uses E double flat")
-	_check(Theory.triad_voicings(c_root, 0).has([Vector2i(3, 2), Vector2i(2, 0)]), "C E G golden voicing")
-	_check(Theory.triad_voicings(Vector2i(5, 0), 1).has([Vector2i(2, 0), Vector2i(1, 0)]), "All-open E minor voicing")
+	_check(Theory.chord_voicings(c_root, 0).has([Vector2i(3, 2), Vector2i(2, 0)]), "C E G golden voicing")
+	_check(Theory.chord_voicings(Vector2i(5, 0), 1).has([Vector2i(2, 0), Vector2i(1, 0)]), "All-open E minor voicing")
 	for string_index in range(6):
 		for fret in range(Theory.LAST_FRET + 1):
 			var root_position := Vector2i(string_index, fret)
@@ -117,12 +119,12 @@ func _theory_tests() -> void:
 						_check(candidate != root_position and Theory.is_position_valid(candidate), "Answer bounds and root exclusion")
 						_check(posmod(Theory.midi(candidate) - Theory.midi(root_position), 12) == interval, "Pitch class correct")
 						_check(not nearby or absi(candidate.y - fret) <= 4, "Range correct")
-				for chord_index in range(4):
-					for voicing in Theory.triad_voicings(root_position, chord_index, nearby):
+				for chord_index in range(Theory.CHORDS.size()):
+					for voicing in Theory.chord_voicings(root_position, chord_index, nearby):
 						_check(voicing[0].x != string_index and voicing[1].x != string_index and voicing[0].x != voicing[1].x, "Three distinct strings")
-						_check(Theory.relative_pc(root_position, voicing[0]) == Theory.TRIADS[chord_index].tones[0], "Triad third correct")
-						_check(Theory.relative_pc(root_position, voicing[1]) == Theory.TRIADS[chord_index].tones[1], "Triad fifth correct")
-	print("PASS: theory, 96 roots × 12 pitch classes × 2 scopes; four triad qualities")
+						_check(Theory.relative_pc(root_position, voicing[0]) == Theory.CHORDS[chord_index].tones[0], "First required chord degree correct")
+						_check(Theory.relative_pc(root_position, voicing[1]) == Theory.CHORDS[chord_index].tones[1], "Voicing fifth, sixth or seventh correct")
+	print("PASS: theory, 96 roots × 12 pitch classes × 2 scopes; twelve three-note chord types")
 
 
 func _spectral_amplitude(samples: PackedFloat32Array, hz: float, start: int, count: int) -> float:
@@ -142,7 +144,10 @@ func _audio_model_tests() -> void:
 	root.add_child(synth)
 	_check(is_equal_approx(TonePlayer.frequency(69), 440.0), "A4 tuning reference 440 Hz")
 	_check(absf(TonePlayer.frequency(40) - 82.406889) < 0.0001, "Low E2 frequency")
-	var cases: Array[Array] = [[69], [48, 52], [48, 52, 55], [48, 51, 55], [48, 51, 54], [48, 52, 56], [40, 64], [48, 48, 48]]
+	var cases: Array[Array] = [[69], [48, 52], [48, 52, 55], [48, 51, 55], [48, 51, 54], [48, 52, 56], [48, 52, 59], [48, 52, 58], [48, 51, 58], [48, 51, 59], [48, 52, 57], [48, 51, 57], [48, 50, 55], [48, 53, 55], [40, 64], [48, 48, 48]]
+	# Low four strings: C7/E, frets 0, 1, 5, 5. Frequencies must retain the E2 bass.
+	cases.append([40, 46, 55, 60])
+	cases.append([48, 48, 48, 48])
 	for notes in cases:
 		var typed_notes: Array[int] = []
 		typed_notes.assign(notes)
@@ -165,9 +170,9 @@ func _audio_model_tests() -> void:
 			DirAccess.make_dir_recursive_absolute(capture_dir)
 			var filename: String = {1: "single-a4", 2: "dyad-c-e", 3: "triad-c-e-g"}[notes.size()]
 			_check(stream.save_to_wav(capture_dir.path_join(filename + ".wav")) == OK, "Export audio preview " + filename)
-	_check(synth.stream_for([]) == null and synth.stream_for([-1]) == null and synth.stream_for([48, 52, 55, 60]) == null, "Reject invalid note groups")
+	_check(synth.stream_for([]) == null and synth.stream_for([-1]) == null and synth.stream_for([48, 52, 55, 58, 62]) == null, "Reject empty, invalid MIDI or more than four voices")
 	synth.queue_free()
-	print("PASS: PCM pitch spectra, simultaneous voices, four triad qualities, octave register, envelopes and clipping")
+	print("PASS: PCM pitch spectra, simultaneous triads and four-note inversions, octave register, envelopes and clipping")
 
 
 func _ui_tests() -> void:
@@ -175,14 +180,16 @@ func _ui_tests() -> void:
 	root.add_child(app)
 	app.tone_player.set_muted(true)
 	await _frames(5)
-	_check(app.mode == 0 and app.board.markers.size() > 0, "Lookup starts with answers")
+	_check(app.mode == 4 and app.inversion_practice.active and not app.practice_tabs.visible, "Home opens chord lookup with exercises under secondary navigation")
+	await _click(app.mode_buttons[0])
+	_check(app.mode == 0 and app.board.markers.size() > 0, "Interval lookup opens with positions visible")
 	_check(app.board.size.x >= 900 and app.board.size.y >= 280, "Fretboard has usable dimensions")
 	await _capture("01-lookup")
 	await _click(app.root_placement_button)
 	await _note(Vector2i(2, 5))
 	_check(app.root_position == Vector2i(2, 5), "Real board click changes root")
 	_check(not app.placing_root, "Root placement returns to audition mode")
-	_check(app.root_label.text.contains("C4") and app.root_label.text.contains("3 弦 5 品"), "Root summary shows actual note and position")
+	_check(app.root_label.text.contains("根音  C   ·") and app.root_label.text.contains("3 弦 5 品"), "Root summary shows actual note and position")
 	await _click(app.mode_buttons[1])
 	_check(app.mode == 1 and app.board.markers.is_empty(), "Dyad hides answers")
 	_check(app.board.conceal_answers and app.notes_check.disabled, "Practice hides note-name assistance")
@@ -221,9 +228,9 @@ func _ui_tests() -> void:
 	await _note(Vector2i(2, 0))
 	await _note(Vector2i(3, 2))
 	_check(app.question_complete and app.completed_count == 2, "Triad accepts fifth before third")
-	_check(app.formula_label.text.contains("C – E – G"), "Completion reveals correctly spelled chord")
+	_check(app.task_panel.voicing_label.text.contains("C – E – G"), "Completion reveals correctly spelled chord")
 	await _capture("03-triad-complete")
-	for chord_index in range(4):
+	for chord_index in range(Theory.CHORDS.size()):
 		app._on_chord_changed(chord_index)
 		app._new_question()
 		_check(not app._voicings().is_empty(), "Generated chord question solvable")
@@ -231,10 +238,12 @@ func _ui_tests() -> void:
 		var voicing: Array = app._voicings()[0]
 		await _note(voicing[0])
 		await _note(voicing[1])
-		_check(app.question_complete, "All four triad qualities accept valid answers")
+		_check(app.question_complete, "All twelve three-note chord types accept valid answers")
 	app._set_mode(0)
 	for interval in range(12):
-		app._on_interval_changed(interval)
+		app.interval_index = interval
+		app.selected_intervals.assign([interval])
+		app._reset_question()
 		_check(app.board.markers.size() == Theory.candidates(app.root_position, interval, app.nearby).size(), "Lookup markers match selected interval")
 	app._on_interval_changed(9)
 	await _frames()
@@ -268,6 +277,7 @@ func _audio_ui_tests() -> void:
 	app._set_mode(0)
 	app.root_position = Vector2i(4, 3)
 	app.interval_index = 4
+	app.selected_intervals.assign([4])
 	app.nearby = true
 	app.nearby_check.set_pressed_no_signal(true)
 	app.notes_check.set_pressed_no_signal(false)
@@ -277,7 +287,7 @@ func _audio_ui_tests() -> void:
 	await _note(Vector2i(3, 2))
 	_check(app.root_position == Vector2i(4, 3) and app.audition_target == Vector2i(3, 2), "Audition preserves root and selects a concrete dyad position")
 	_check(app.tone_player.current_notes == [52] and app.board.sounding == [Vector2i(3, 2)], "Board click plays actual E3 and highlights its position")
-	_check(app.note_readout.text == "音名：E3（4 弦 · 2 品）", "Clicked note name, octave and location shown immediately")
+	_check(app.note_readout.text == "音名：E（4 弦 · 2 品）", "Clicked pitch class and string/fret shown immediately")
 	_check(app.board.named_positions == [Vector2i(3, 2)], "Clicked circle carries its actual note label")
 	await _capture("06-clicked-note-name")
 	await _check_audio_output("single E3")
@@ -286,21 +296,21 @@ func _audio_ui_tests() -> void:
 	_check(app.board.named_positions == [Vector2i(3, 2)] and app.board.sounding.is_empty(), "Circle note name remains after playback stops")
 	await _click(app.play_group_button)
 	_check(app.tone_player.current_notes == [48, 52] and app.board.sounding.size() == 2, "Lookup plays C3 and E3 together")
-	_check(app.note_readout.text.contains("C3") and app.note_readout.text.contains("E3"), "Dyad shows both actual note names")
+	_check(app.note_readout.text.contains("C（") and app.note_readout.text.contains("E（"), "Dyad shows both actual note names")
 	_check(app.board.named_positions.size() == 2, "Simultaneous notes each have a circle label")
 	await _check_audio_output("dyad C3 E3")
 	await _capture("04-dyad-audio")
 	await _note(Vector2i(5, 0))
 	await _click(app.play_group_button)
 	_check(app.tone_player.current_notes == [48, 40], "Lower E2 position stays below C3; playback does not fold octaves")
-	_check(app.note_readout.text.contains("E2") and not app.note_readout.text.contains("E3"), "Readout preserves actual octave")
+	_check(app.note_readout.text.contains("E（6 弦 · 0 品）"), "Readout identifies the lower E by its string and fret")
 	await _click(app.mode_buttons[1])
 	_check(app.play_group_button.disabled and app.board.sounding.is_empty(), "New question stops sound and hides unselected answer from group playback")
-	_check(not app.note_readout.text.contains("E2"), "Changing question clears previous note readout")
+	_check(app.note_readout.text == "點選指板，查看音名與弦品", "Changing question clears previous note readout")
 	_check(app.board.named_positions.is_empty(), "New question removes previous circle labels")
 	await _click(app.play_root_button)
 	_check(app.tone_player.current_notes == [48], "Root can be auditioned during practice")
-	_check(app.note_readout.text == "音名：C3（5 弦 · 3 品）", "Root audition shows note name in practice")
+	_check(app.note_readout.text == "音名：C（5 弦 · 3 品）", "Root audition shows note name in practice")
 	await _note(Vector2i(3, 2))
 	_check(app.question_complete, "Audio preserves dyad grading")
 	var completed: int = app.completed_count
@@ -308,7 +318,7 @@ func _audio_ui_tests() -> void:
 	_check(app.tone_player.current_notes == [48, 52] and app.completed_count == completed, "Replay does not change score")
 	await _note(Vector2i(5, 0))
 	_check(app.tone_player.current_notes == [40] and app.completed_count == completed, "Completed question still allows single-note listening without regrading")
-	_check(app.note_readout.text == "音名：E2（6 弦 · 0 品）", "Completed question still updates clicked note name")
+	_check(app.note_readout.text == "音名：E（6 弦 · 0 品）", "Completed question still updates clicked note name")
 	await _click(app.next_button)
 	app.root_position = Vector2i(4, 3)
 	app._reset_question()
@@ -326,8 +336,8 @@ func _audio_ui_tests() -> void:
 	_check(app.tone_player.current_notes == [48, 52], "Partial triad can be heard as a dyad")
 	await _note(Vector2i(2, 0))
 	await _click(app.play_group_button)
-	_check(app.tone_player.current_notes == [48, 52, 55] and app.play_group_button.text == "播放三和弦", "Full triad plays all three actual pitches")
-	_check(app.note_readout.text.contains("C3") and app.note_readout.text.contains("E3") and app.note_readout.text.contains("G3"), "Triad shows all three actual note names")
+	_check(app.tone_player.current_notes == [48, 52, 55] and app.play_group_button.text == "播放三音", "Full triad plays all three actual pitches")
+	_check(app.note_readout.text.contains("C（") and app.note_readout.text.contains("E（") and app.note_readout.text.contains("G（"), "Triad shows all three actual note names")
 	var completed_triad_root: Vector2i = app.root_position
 	await _check_audio_output("triad C3 E3 G3")
 	await _capture("05-triad-audio")
@@ -335,7 +345,7 @@ func _audio_ui_tests() -> void:
 	_check(app.tone_player.muted and not app.tone_player.player.playing and app.board.sounding.is_empty(), "Mute immediately stops sound and clears highlights")
 	await _note(Vector2i(0, 0))
 	_check(app.tone_player.current_notes.is_empty(), "Muted clicks cannot start sound")
-	_check(app.note_readout.text == "音名：E4（1 弦 · 0 品）", "Muted click still shows note identity")
+	_check(app.note_readout.text == "音名：E（1 弦 · 0 品）", "Muted click still shows note identity")
 	_check(app.board.named_positions == [Vector2i(0, 0)], "Muted click still labels its circle")
 	await _click(app.mute_button)
 	app.volume_slider.value = 0
@@ -346,13 +356,13 @@ func _audio_ui_tests() -> void:
 	_check(app.tone_player.current_notes.size() == 3 and app.tone_player.player.playing, "Restoring volume allows playback")
 	await create_timer(1.75).timeout
 	_check(app.board.sounding.is_empty() and app.tone_player.current_notes.is_empty(), "Playback completion clears all highlights")
-	_check(app.root_position != completed_triad_root and not app.question_complete and app.note_readout.text == "點選指板，查看音名與八度", "Completed triad advances automatically and clears previous note names")
+	_check(app.root_position != completed_triad_root and not app.question_complete and app.note_readout.text == "點選指板，查看音名與弦品", "Completed triad advances automatically and clears previous note names")
 	await _click(app.next_button)
 	app.root_position = Vector2i(4, 3)
 	app._reset_question()
 	await _frames()
 	await _note(Vector2i(4, 4))
-	_check(app.note_readout.text == "音名：C♯3（5 弦 · 4 品）" and app.picked.is_empty(), "Wrong practice answer shows the clicked accidental without selecting it")
+	_check(app.note_readout.text == "音名：C♯（5 弦 · 4 品）" and app.picked.is_empty(), "Wrong practice answer shows the clicked accidental without selecting it")
 	app.tone_player.stop()
 	await create_timer(0.1).timeout
 	_check(AudioServer.get_bus_volume_db(0) == master_volume, "App volume does not change the master bus")
@@ -366,6 +376,7 @@ func _auto_advance_tests() -> void:
 	app._set_mode(1)
 	app.root_position = Vector2i(4, 3)
 	app.interval_index = 4
+	app.selected_intervals.assign([4])
 	app._reset_question()
 	await _frames()
 	var start_root: Vector2i = app.root_position
@@ -375,7 +386,7 @@ func _auto_advance_tests() -> void:
 	_check(app.root_position == start_root and not app.question_complete and app.auto_advance_timer.is_stopped(), "Wrong answer stays on the same question")
 	await _note(Vector2i(3, 2))
 	_check(app.question_complete and app.completed_count == score + 1, "Correct dyad counted immediately")
-	_check(app.instruction_label.text.contains("答對了") and app.feedback_label.text.contains("自動進入下一題"), "Correct answer gives explicit success feedback")
+	_check(app.task_panel.feedback_state.text.contains("答對了") and app.feedback_label.text.contains("自動進入下一題"), "Correct answer gives explicit success feedback")
 	await _note(Vector2i(3, 2))
 	await create_timer(0.3).timeout
 	_check(app.question_complete and app.root_position == start_root and app.completed_count == score + 1, "Feedback stays visible briefly; repeated clicks cannot award more credit")
@@ -395,7 +406,7 @@ func _auto_advance_tests() -> void:
 	await create_timer(1.8).timeout
 	_check(app.root_position == Vector2i(4, 3) and app.picked.size() == 1 and not app.question_complete, "One correct triad tone does not advance prematurely")
 	await _note(Vector2i(2, 0))
-	_check(app.question_complete and app.instruction_label.text.contains("答對了"), "Complete triad receives success feedback")
+	_check(app.question_complete and app.task_panel.feedback_state.text.contains("答對了"), "Complete triad receives success feedback")
 	await create_timer(1.8).timeout
 	_check(app.mode == 2 and app.chord_index == 0 and app.root_position != Vector2i(4, 3) and app.picked.is_empty(), "Complete triad advances and preserves selected quality")
 	app._set_mode(1)
@@ -431,15 +442,19 @@ func _selection_ui_tests() -> void:
 	app._set_mode(0)
 	app.root_position = Vector2i(5, 2)
 	app.interval_index = 4
+	app.selected_intervals.assign([4])
 	app._reset_question()
 	await _frames()
-	_check(app.root_label.text.contains("F♯2") and app.root_label.text.contains("6 弦 2 品"), "Root summary names fretted F sharp rather than open-string E")
+	_check(app.root_label.text.contains("根音  F♯   ·") and app.root_label.text.contains("6 弦 2 品"), "Root summary names fretted F sharp rather than open-string E")
 	_check(app.interval_buttons.size() == 12 and app.interval_choices.visible, "All twelve interval choices are directly available")
 	await _capture("08-direct-interval-selection")
 	await _click(app.interval_buttons[9])
-	_check(app.interval_index == 9 and app.interval_buttons[9].button_pressed and not app.interval_buttons[4].button_pressed, "Major-sixth button selects and highlights the interval")
+	_check(app.interval_index == 9 and app.interval_buttons[9].button_pressed and app.interval_buttons[4].button_pressed, "Major-sixth adds a choice while preserving selected major third")
 	await _click(app.interval_buttons[8])
 	_check(app.interval_index == 8 and app.root_position == Vector2i(5, 2), "Minor-sixth comparison keeps the same root")
+	await _click(app.interval_buttons[9])
+	await _click(app.interval_buttons[4])
+	_check(app.selected_intervals == [8], "Clicking selected keys removes them and preserves the remaining interval")
 	await _note(app._valid_answers()[0])
 	var feedback: String = app.feedback
 	var target: Vector2i = app.audition_target
@@ -451,7 +466,7 @@ func _selection_ui_tests() -> void:
 	_check(not app.placing_root and app.root_position == Vector2i(5, 2) and app.board.nearby, "Root selection can be canceled without changing root")
 	await _click(app.root_placement_button)
 	await _note(Vector2i(0, 15))
-	_check(app.root_position == Vector2i(0, 15) and not app.placing_root and app.root_label.text.contains("G5"), "Root can be selected outside the old local range")
+	_check(app.root_position == Vector2i(0, 15) and not app.placing_root and app.root_label.text.contains("根音  G   ·"), "Root can be selected outside the old local range")
 	await _click(app.mode_buttons[1])
 	var mistakes: int = app.mistake_count
 	var completed: int = app.completed_count
@@ -460,7 +475,7 @@ func _selection_ui_tests() -> void:
 	_check(app.mode == 1 and app.root_position == Vector2i(5, 2) and not app.placing_root, "Practice also supports direct root placement")
 	_check(app.mistake_count == mistakes and app.completed_count == completed and app.picked.is_empty(), "Choosing a root never grades it as an answer")
 	await _click(app.mode_buttons[2])
-	_check(app.chord_buttons.size() == 4 and app.chord_choices.visible and not app.interval_choices.visible, "All four chord qualities are directly available")
+	_check(app.chord_buttons.size() == 12 and app.chord_choices.visible and not app.interval_choices.visible, "All twelve chord choices are directly available")
 	await _click(app.chord_buttons[1])
 	_check(app.chord_index == 1 and app.chord_buttons[1].button_pressed and not app.chord_buttons[0].button_pressed and app.formula_label.text.contains("♭3"), "Minor-triad choice updates formula and selected state")
 	await _capture("09-direct-chord-selection")
@@ -479,7 +494,7 @@ func _selection_ui_tests() -> void:
 	await _click(app.root_placement_button)
 	await create_timer(1.8).timeout
 	_check(not app.placing_root and not app.question_complete and app.root_position != completed_root, "Canceling root placement resumes completed-question advancement")
-	print("PASS: visible interval/chord choices, actual root note, one selected option, full-board placement and practice-safe root editing")
+	print("PASS: visible interval/chord choices, actual root note, multiple interval choices, full-board placement and practice-safe root editing")
 
 
 func _instrument_layout_tests() -> void:
@@ -502,6 +517,7 @@ func _instrument_layout_tests() -> void:
 	app._set_mode(0)
 	app.root_position = Vector2i(4, 3)
 	app.interval_index = 4
+	app.selected_intervals.assign([4])
 	app._reset_question()
 	app.tone_player.set_muted(false)
 	await _frames()
@@ -521,13 +537,14 @@ func _double_root_tests() -> void:
 	await _note(Vector2i(2, 6))
 	_check(app.root_position == Vector2i(4, 3), "Single click continues audition without changing root")
 	await _double_note(Vector2i(2, 6))
-	_check(app.root_position == Vector2i(2, 6) and app.root_label.text.contains("C♯4"), "Real double-click selects root and refreshes actual note name")
+	_check(app.root_position == Vector2i(2, 6) and app.root_label.text.contains("根音  C♯   ·"), "Real double-click selects root and refreshes actual note name")
 	_check(app.tone_player.current_notes == [61] and app.board.named_positions == [Vector2i(2, 6)], "New root is auditioned and labeled inside its circle")
 	await _double_note(Vector2i(0, 15))
 	_check(app.root_position == Vector2i(0, 15), "Double-click can choose a root outside the old local range")
 	app.tone_player.set_muted(true)
 	app._set_mode(1)
 	app.interval_index = 4
+	app.selected_intervals.assign([4])
 	app.root_position = Vector2i(4, 3)
 	app._reset_question()
 	await _frames()

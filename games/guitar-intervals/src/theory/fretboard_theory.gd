@@ -24,11 +24,21 @@ const INTERVALS: Array[Dictionary] = [
 	{"name": "小七度", "symbol": "♭7", "semitones": 10, "letter_steps": 6},
 	{"name": "大七度", "symbol": "7", "semitones": 11, "letter_steps": 6},
 ]
-const TRIADS: Array[Dictionary] = [
-	{"name": "大三和弦", "suffix": "", "formula": "1 · 3 · 5", "tones": [4, 7], "steps": [2, 4], "symbols": ["3", "5"]},
-	{"name": "小三和弦", "suffix": "m", "formula": "1 · ♭3 · 5", "tones": [3, 7], "steps": [2, 4], "symbols": ["♭3", "5"]},
-	{"name": "減三和弦", "suffix": "dim", "formula": "1 · ♭3 · ♭5", "tones": [3, 6], "steps": [2, 4], "symbols": ["♭3", "♭5"]},
-	{"name": "增三和弦", "suffix": "aug", "formula": "1 · 3 · ♯5", "tones": [4, 8], "steps": [2, 4], "symbols": ["3", "♯5"]},
+# Full chord definitions include the root; tones/steps/symbols describe only the
+# two answers in this exercise's three-note voicing. The root is always given.
+const CHORDS: Array[Dictionary] = [
+	{"name": "大三和弦", "suffix": "", "formula": "1 · 3 · 5", "full_tones": [0, 4, 7], "full_steps": [0, 2, 4], "voicing_formula": "1 · 3 · 5", "tones": [4, 7], "steps": [2, 4], "symbols": ["3", "5"], "group": "basic_sus", "omit_fifth": false},
+	{"name": "小三和弦", "suffix": "m", "formula": "1 · ♭3 · 5", "full_tones": [0, 3, 7], "full_steps": [0, 2, 4], "voicing_formula": "1 · ♭3 · 5", "tones": [3, 7], "steps": [2, 4], "symbols": ["♭3", "5"], "group": "basic_sus", "omit_fifth": false},
+	{"name": "減三和弦", "suffix": "dim", "formula": "1 · ♭3 · ♭5", "full_tones": [0, 3, 6], "full_steps": [0, 2, 4], "voicing_formula": "1 · ♭3 · ♭5", "tones": [3, 6], "steps": [2, 4], "symbols": ["♭3", "♭5"], "group": "basic_sus", "omit_fifth": false},
+	{"name": "增三和弦", "suffix": "aug", "formula": "1 · 3 · ♯5", "full_tones": [0, 4, 8], "full_steps": [0, 2, 4], "voicing_formula": "1 · 3 · ♯5", "tones": [4, 8], "steps": [2, 4], "symbols": ["3", "♯5"], "group": "basic_sus", "omit_fifth": false},
+	{"name": "大七和弦", "suffix": "maj7", "formula": "1 · 3 · 5 · 7", "full_tones": [0, 4, 7, 11], "full_steps": [0, 2, 4, 6], "voicing_formula": "1 · 3 · 7", "tones": [4, 11], "steps": [2, 6], "symbols": ["3", "7"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "屬七和弦", "suffix": "7", "formula": "1 · 3 · 5 · ♭7", "full_tones": [0, 4, 7, 10], "full_steps": [0, 2, 4, 6], "voicing_formula": "1 · 3 · ♭7", "tones": [4, 10], "steps": [2, 6], "symbols": ["3", "♭7"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "小七和弦", "suffix": "m7", "formula": "1 · ♭3 · 5 · ♭7", "full_tones": [0, 3, 7, 10], "full_steps": [0, 2, 4, 6], "voicing_formula": "1 · ♭3 · ♭7", "tones": [3, 10], "steps": [2, 6], "symbols": ["♭3", "♭7"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "小大七和弦", "suffix": "mMaj7", "formula": "1 · ♭3 · 5 · 7", "full_tones": [0, 3, 7, 11], "full_steps": [0, 2, 4, 6], "voicing_formula": "1 · ♭3 · 7", "tones": [3, 11], "steps": [2, 6], "symbols": ["♭3", "7"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "大六和弦", "suffix": "6", "formula": "1 · 3 · 5 · 6", "full_tones": [0, 4, 7, 9], "full_steps": [0, 2, 4, 5], "voicing_formula": "1 · 3 · 6", "tones": [4, 9], "steps": [2, 5], "symbols": ["3", "6"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "小六和弦", "suffix": "m6", "formula": "1 · ♭3 · 5 · 6", "full_tones": [0, 3, 7, 9], "full_steps": [0, 2, 4, 5], "voicing_formula": "1 · ♭3 · 6", "tones": [3, 9], "steps": [2, 5], "symbols": ["♭3", "6"], "group": "seventh_sixth", "omit_fifth": true},
+	{"name": "掛二和弦", "suffix": "sus2", "formula": "1 · 2 · 5", "full_tones": [0, 2, 7], "full_steps": [0, 1, 4], "voicing_formula": "1 · 2 · 5", "tones": [2, 7], "steps": [1, 4], "symbols": ["2", "5"], "group": "basic_sus", "omit_fifth": false},
+	{"name": "掛四和弦", "suffix": "sus4", "formula": "1 · 4 · 5", "full_tones": [0, 5, 7], "full_steps": [0, 3, 4], "voicing_formula": "1 · 4 · 5", "tones": [5, 7], "steps": [3, 4], "symbols": ["4", "5"], "group": "basic_sus", "omit_fifth": false},
 ]
 
 
@@ -50,8 +60,37 @@ static func note_name(position: Vector2i) -> String:
 	return "%s%d" % [NOTE_NAMES[value % 12], value / 12 - 1]
 
 
+static func pitch_class_name(position: Vector2i) -> String:
+	return NOTE_NAMES[midi(position) % 12]
+
+
 static func root_name(root: Vector2i) -> String:
-	return NOTE_NAMES[midi(root) % 12]
+	return pitch_class_name(root)
+
+
+## The optional diatonic spelling distinguishes e.g. an augmented fifth from a
+## minor sixth. Unspelled auditioned notes use the interval lookup's convention.
+static func interval_label(semitones: int, letter_steps: int = -1) -> String:
+	var pc := posmod(semitones, 12)
+	var step := posmod(letter_steps, 7) if letter_steps >= 0 else int(INTERVALS[pc].letter_steps)
+	var degree := str(step + 1)
+	var change := posmod(pc - NATURAL_PC[step] + 6, 12) - 6
+	if change == 0:
+		if step == 0:
+			return "R"
+		return "maj7" if step == 6 else degree
+	if step in [1, 2, 5, 6]:
+		if change == -1:
+			return "m" + degree
+		if change == -2:
+			return "dim" + degree
+	return ("♯".repeat(change) if change > 0 else "♭".repeat(-change)) + degree
+
+
+static func chord_interval_label(chord: Dictionary, semitones: int) -> String:
+	var tones: Array = chord.get("full_tones", [])
+	var index := tones.find(posmod(semitones, 12))
+	return interval_label(semitones, chord.full_steps[index] if index >= 0 else -1)
 
 
 static func spelled_note(root: Vector2i, semitones: int, letter_steps: int) -> String:
@@ -86,19 +125,31 @@ static func movement(root: Vector2i, position: Vector2i) -> String:
 	return "%s，%s（實際音高 %+d 半音）" % [string_text, fret_text, delta]
 
 
-static func triad_voicings(root: Vector2i, chord_index: int, nearby: bool = true) -> Array[Array]:
-	## Different strings and a maximum four-fret fretted span make answers playable.
+static func chord_note_names(root: Vector2i, chord_index: int, played_only: bool = false) -> Array[String]:
+	var chord: Dictionary = CHORDS[chord_index]
+	var result: Array[String] = [root_name(root)]
+	if played_only:
+		for index in range(chord.tones.size()):
+			result.append(spelled_note(root, chord.tones[index], chord.steps[index]))
+	else:
+		for index in range(1, chord.full_tones.size()):
+			result.append(spelled_note(root, chord.full_tones[index], chord.full_steps[index]))
+	return result
+
+
+static func chord_voicings(root: Vector2i, chord_index: int, nearby: bool = true) -> Array[Array]:
+	## Position candidates on different strings, with a four-fret fretted span.
 	## Open strings do not stretch the fretting hand; the fixed root counts in the span.
-	var chord: Dictionary = TRIADS[chord_index]
+	var chord: Dictionary = CHORDS[chord_index]
 	var result: Array[Array] = []
-	for third in candidates(root, chord.tones[0], nearby):
-		for fifth in candidates(root, chord.tones[1], nearby):
-			if root.x == third.x or root.x == fifth.x or third.x == fifth.x:
+	for first in candidates(root, chord.tones[0], nearby):
+		for other in candidates(root, chord.tones[1], nearby):
+			if root.x == first.x or root.x == other.x or first.x == other.x:
 				continue
 			var fretted: Array[int] = []
-			for position: Vector2i in [root, third, fifth]:
+			for position: Vector2i in [root, first, other]:
 				if position.y > 0:
 					fretted.append(position.y)
 			if fretted.is_empty() or fretted.max() - fretted.min() <= LOCAL_RADIUS:
-				result.append([third, fifth])
+				result.append([first, other])
 	return result

@@ -8,6 +8,7 @@ const P = preload("res://src/ui/instrument_theme.gd")
 
 var tone_player: Node
 var mono_font: Font
+var text_only: bool = OS.has_feature("web")
 var speech: Node
 var board: Control
 var active: bool = false
@@ -26,6 +27,12 @@ var language: OptionButton
 var microphone: Button
 var cancel_button: Button
 var status: Label
+var voice_phase_panel: PanelContainer
+var voice_stage: Label
+var voice_guidance: Label
+var input_meter: ProgressBar
+var meter_caption: Label
+var voice_notice: String = ""
 var heard: Label
 var readout: Label
 var question: Label
@@ -47,6 +54,8 @@ func _ready() -> void:
 		status.text = message
 		_refresh_buttons()
 	)
+	speech.phase_changed.connect(func(_phase: String) -> void: _refresh_buttons())
+	speech.meter_changed.connect(func(_level: float, _remaining: int) -> void: _refresh_buttons())
 	speech.failed.connect(func(message: String) -> void:
 		status.text = message
 		_refresh_buttons()
@@ -84,21 +93,21 @@ func _button(text: String, action: Callable) -> Button:
 
 
 func _build() -> void:
-	var toolbar := HBoxContainer.new()
-	toolbar.add_theme_constant_override("separation", 14)
+	var toolbar := HFlowContainer.new()
+	toolbar.add_theme_constant_override("h_separation", 14)
 	add_child(toolbar)
 	natural_check = CheckButton.new()
 	natural_check.text = "先練自然音 A–G"
 	natural_check.button_pressed = true
 	natural_check.toggled.connect(func(_value: bool) -> void: _new_question())
 	toolbar.add_child(natural_check)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	toolbar.add_child(spacer)
+	var language_controls := HBoxContainer.new()
+	language_controls.visible = not text_only
+	toolbar.add_child(language_controls)
 	var language_label := Label.new()
 	language_label.text = "辨識語言"
 	language_label.add_theme_color_override("font_color", P.MUTED)
-	toolbar.add_child(language_label)
+	language_controls.add_child(language_label)
 	language = OptionButton.new()
 	language.add_item("English · A–G / Do–Si")
 	language.add_item("中文 · 音名／唱名")
@@ -108,7 +117,7 @@ func _build() -> void:
 		status.text = "語言已切換。音名與固定唱名都接受。"
 		_refresh_buttons()
 	)
-	toolbar.add_child(language)
+	language_controls.add_child(language)
 	body = BoxContainer.new()
 	body.add_theme_constant_override("separation", 14)
 	add_child(body)
@@ -118,7 +127,7 @@ func _build() -> void:
 	body.add_child(display)
 	var screen := VBoxContainer.new()
 	display.add_child(screen)
-	screen.add_child(_label("READ THE DOT  /  看位置，說出音名或唱名", 13, P.SCREEN_MUTED))
+	screen.add_child(_label("READ THE DOT  /  看位置，輸入音名或唱名" if text_only else "READ THE DOT  /  看位置，說出音名或唱名", 13, P.SCREEN_MUTED))
 	board = Board.new()
 	board.read_quiz = true
 	board.nearby = false
@@ -130,6 +139,7 @@ func _build() -> void:
 	screen.add_child(readout)
 	screen.add_child(_label("1 弦在上方 · 6 弦在下方；只讀音名，不必說八度。", 12, P.SCREEN_MUTED))
 	var mic_panel := PanelContainer.new()
+	mic_panel.visible = not text_only
 	mic_panel.custom_minimum_size.x = 264
 	mic_panel.add_theme_stylebox_override("panel", P.panel(Color("e1e5d9"), P.LINE, 5, 12))
 	body.add_child(mic_panel)
@@ -137,19 +147,41 @@ func _build() -> void:
 	mic_controls.add_theme_constant_override("separation", 10)
 	mic_panel.add_child(mic_controls)
 	mic_controls.add_child(_label("04 / VOICE · 口說讀譜", 15))
-	mic_controls.add_child(_label("A–G 或 Do–Si 都可以\nB = Si / Ti\nF sharp = 升 Fa\nB flat = 降 Si", 15))
+	mic_controls.add_child(_label("A–G 或 Do–Si 都可以\n例：F sharp＝升 Fa", 13))
+	voice_phase_panel = PanelContainer.new()
+	voice_phase_panel.add_theme_stylebox_override("panel", P.panel(P.KEY, P.LINE, 4, 10))
+	mic_controls.add_child(voice_phase_panel)
+	var phase_content := VBoxContainer.new()
+	phase_content.add_theme_constant_override("separation", 4)
+	voice_phase_panel.add_child(phase_content)
+	voice_stage = _label("準備作答", 19)
+	phase_content.add_child(voice_stage)
+	voice_guidance = _label("按開始，等提示後再說話。", 13, P.MUTED)
+	phase_content.add_child(voice_guidance)
 	microphone = _button("● 開始口說", _toggle_microphone)
-	microphone.add_theme_stylebox_override("normal", P.key(P.ROOT))
+	microphone.custom_minimum_size.y = 48
 	mic_controls.add_child(microphone)
-	cancel_button = _button("取消聆聽", func() -> void:
+	input_meter = ProgressBar.new()
+	input_meter.min_value = 0.0
+	input_meter.max_value = 1.0
+	input_meter.show_percentage = false
+	input_meter.tooltip_text = "麥克風收到的音量"
+	input_meter.custom_minimum_size.y = 7
+	input_meter.add_theme_stylebox_override("background", P.panel(P.LINE, Color.TRANSPARENT, 2, 0))
+	input_meter.add_theme_stylebox_override("fill", P.panel(P.SUCCESS, Color.TRANSPARENT, 2, 0))
+	mic_controls.add_child(input_meter)
+	meter_caption = _label("麥克風未開啟", 12, P.MUTED)
+	mic_controls.add_child(meter_caption)
+	cancel_button = _button("取消這次作答", func() -> void:
 		speech.cancel()
+		voice_notice = "cancelled"
 		status.text = "已取消。沒有判題，也不計錯。"
 		_refresh_buttons()
 	)
 	mic_controls.add_child(cancel_button)
 	status = _label("按下才聽。首次使用需允許麥克風與語音辨識。", 13, P.MUTED)
 	mic_controls.add_child(status)
-	mic_controls.add_child(_label("裝置端辨識 · 不儲存錄音\n說出名稱即可，不必唱出音高。", 12, P.MUTED))
+	mic_controls.add_child(_label("裝置端辨識 · 不儲存錄音", 11, P.MUTED))
 	var task := PanelContainer.new()
 	task.add_theme_stylebox_override("panel", P.panel(P.CASE, P.LINE, 4, 12))
 	add_child(task)
@@ -168,27 +200,24 @@ func _build() -> void:
 	input_row.add_theme_constant_override("separation", 8)
 	controls.add_child(input_row)
 	typed_answer = LineEdit.new()
-	typed_answer.placeholder_text = "也可輸入：B、Si、F sharp、升 Fa"
+	typed_answer.placeholder_text = "輸入音名或唱名，例如 B、Si、F sharp、升 Fa" if text_only else "也可輸入：B、Si、F sharp、升 Fa"
 	typed_answer.custom_minimum_size.y = 44
 	typed_answer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	typed_answer.text_submitted.connect(_submit_text)
 	input_row.add_child(typed_answer)
 	submit_button = _button("送出答案", func() -> void: _submit_text(typed_answer.text))
 	input_row.add_child(submit_button)
-	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 8)
+	var actions := HFlowContainer.new()
+	actions.add_theme_constant_override("h_separation", 8)
 	controls.add_child(actions)
 	listen_button = _button("聽音提示", _listen)
 	actions.add_child(listen_button)
 	reveal_button = _button("查看音名", _reveal)
 	actions.add_child(reveal_button)
-	var gap := Control.new()
-	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	actions.add_child(gap)
 	next_button = _button("下一題 →", _new_question)
-	next_button.custom_minimum_size.x = 168
 	actions.add_child(next_button)
-	add_child(_label("固定唱名 C = Do，B = Si／Ti；等音接受，例如 F♯ = G♭。沒聽清楚不算答錯。", 12, P.MUTED))
+	var note_help := "固定唱名 C = Do，B = Si／Ti。接受等音，例如 F♯ = G♭。"
+	add_child(_label(note_help if text_only else note_help + "沒聽清楚不算答錯。", 12, P.MUTED))
 
 
 func set_active(enabled: bool) -> void:
@@ -218,6 +247,7 @@ func _new_question() -> void:
 	complete = false
 	revealed = false
 	helped = false
+	voice_notice = ""
 	board.quiz_target = target
 	board.conceal_answers = true
 	board.markers.clear()
@@ -227,8 +257,8 @@ func _new_question() -> void:
 	readout.text = "？  ·  %d 弦 %d 品" % [target.x + 1, target.y]
 	question.text = "這個位置是什麼音？"
 	question.add_theme_color_override("font_color", P.INK)
-	heard.text = "我聽到：—"
-	feedback.text = "看橘色圓點，說出音名或固定唱名。"
+	heard.text = "你的答案：—" if text_only else "我聽到：—"
+	feedback.text = "網頁版以文字作答。看橘色圓點，輸入音名或固定唱名。" if text_only else "看橘色圓點，說出音名或固定唱名。"
 	feedback.add_theme_color_override("font_color", P.MUTED)
 	status.text = "準備好了再按「開始口說」。"
 	typed_answer.clear()
@@ -236,11 +266,12 @@ func _new_question() -> void:
 
 
 func _toggle_microphone() -> void:
-	if not active or complete or revealed:
+	if text_only or not active or complete or revealed:
 		return
-	if speech.active:
+	if speech.phase == "listening":
 		speech.finish()
-	else:
+	elif not speech.active:
+		voice_notice = ""
 		tone_player.stop()
 		speech.start("en-US" if language.selected == 0 else "zh-TW")
 	_refresh_buttons()
@@ -252,10 +283,12 @@ func _recognized(result: Dictionary) -> void:
 	heard.text = "我聽到：%s" % str(result.get("text", ""))
 	var answer: int = Answers.from_recognition(result)
 	if answer < 0:
+		voice_notice = "unclear"
 		status.text = "這次音名不夠明確，請重說；不計錯。"
 		_refresh_buttons()
 		return
 	status.text = "已辨識。"
+	voice_notice = "retry"
 	_judge(answer)
 
 
@@ -263,10 +296,14 @@ func _submit_text(text: String) -> void:
 	if not active or complete or revealed:
 		return
 	speech.cancel()
+	voice_notice = ""
 	heard.text = "你輸入：%s" % text
 	var answer: int = Answers.parse(text)
 	if answer < 0:
 		status.text = "請輸入一個音名或固定唱名，例如 B、Si、B flat、降 Si。不計錯。"
+		if text_only:
+			feedback.text = status.text
+			feedback.add_theme_color_override("font_color", P.INFO)
 		_refresh_buttons()
 		return
 	status.text = "已使用輸入答案。"
@@ -295,7 +332,7 @@ func _judge(answer: int) -> void:
 
 
 func _show_identity() -> void:
-	readout.text = "音名：%s  ·  %d 弦 %d 品" % [Theory.note_name(target), target.x + 1, target.y]
+	readout.text = "音名：%s  ·  %d 弦 %d 品" % [Theory.pitch_class_name(target), target.x + 1, target.y]
 	board.markers[target] = {"text": Theory.NOTE_NAMES[Theory.midi(target) % 12], "color": P.FIFTH if complete else P.TARGET}
 	board.named_positions.assign([target])
 	board.queue_redraw()
@@ -310,7 +347,7 @@ func _inspect_note(position: Vector2i) -> void:
 		feedback.text = "已顯示點選位置的音名；這題完成會記為提示完成。"
 		feedback.add_theme_color_override("font_color", P.INFO)
 	board.named_positions.assign([position])
-	readout.text = "音名：%s  ·  %d 弦 %d 品" % [Theory.note_name(position), position.x + 1, position.y]
+	readout.text = "音名：%s  ·  %d 弦 %d 品" % [Theory.pitch_class_name(position), position.x + 1, position.y]
 	var notes: Array[int] = [Theory.midi(position)]
 	if tone_player.play_notes(notes):
 		board.sounding.assign([position])
@@ -346,13 +383,93 @@ func _reveal() -> void:
 
 
 func _refresh_buttons() -> void:
-	microphone.text = "■ 完成說話" if speech.active else "● 開始口說"
-	microphone.disabled = complete or revealed
+	if not is_instance_valid(microphone):
+		return
+	var phase: String = speech.phase
+	var listening: bool = phase == "listening"
+	microphone.text = "■ 說完了 · 停止收音" if listening else ("● 重新錄音" if phase == "error" or voice_notice in ["unclear", "retry"] else "● 開始口說")
+	if phase == "preparing":
+		microphone.text = "正在準備…"
+	elif phase == "stopping":
+		microphone.text = "正在停止收音…"
+	elif phase == "processing":
+		microphone.text = "正在辨識…"
+	if complete or revealed:
+		microphone.text = "本題已完成" if complete else "已顯示答案"
+	microphone.disabled = complete or revealed or (speech.active and not listening)
 	cancel_button.disabled = not speech.active
-	submit_button.disabled = complete or revealed
-	typed_answer.editable = not complete and not revealed
+	submit_button.disabled = complete or revealed or speech.active
+	typed_answer.editable = not complete and not revealed and not speech.active
+	language.disabled = speech.active
+	natural_check.disabled = speech.active
+	listen_button.disabled = speech.active
 	reveal_button.disabled = complete or revealed
+	_update_voice_guidance(phase)
+	_style_microphone(listening)
+	status.visible = phase == "error" or voice_notice == "unclear" or status.text.begins_with("請輸入")
 	stats.text = "獨立完成 %d 題  ·  提示完成 %d 題  ·  錯答 %d 次" % [correct_count, assisted_count, mistakes]
+
+
+func _update_voice_guidance(phase: String) -> void:
+	var title: String = "準備作答"
+	var guidance: String = "按開始，等顯示「請開始說話」再說。"
+	var color: Color = P.INK
+	var fill: Color = P.KEY
+	if phase == "preparing":
+		title = "正在準備麥克風"
+		guidance = "先不用說話。首次使用請允許系統權限。"
+	elif phase == "listening":
+		title = "請開始說話"
+		guidance = "說一個音名或唱名。說完按「說完了」。"
+		color = P.SUCCESS
+		fill = Color("e1ebd7")
+	elif phase == "stopping":
+		title = "請停止說話"
+		guidance = "正在關閉這次收音，請稍等。"
+	elif phase == "processing":
+		title = "收音已停止"
+		guidance = "正在辨識，不必再說話。"
+		color = P.INFO
+	elif phase == "error" or voice_notice == "unclear":
+		title = "這次辨識未完成" if phase == "error" else "音名不夠明確"
+		guidance = "請看下方說明，重試或輸入答案；不計錯。"
+		color = P.ERROR
+	elif voice_notice == "retry":
+		title = "可以再試一次"
+		guidance = "按重新錄音，等就緒後再說。"
+	elif voice_notice == "cancelled":
+		title = "已取消這次作答"
+		guidance = "這次不計錯。按開始可以重試。"
+	if complete or revealed:
+		title = "✓ 答對了" if complete else "已顯示答案"
+		guidance = "即將進入下一題。" if complete else "按下一題繼續練習。"
+		color = P.SUCCESS if complete else P.INFO
+	voice_stage.text = title
+	voice_stage.add_theme_color_override("font_color", color)
+	voice_guidance.text = guidance
+	voice_phase_panel.add_theme_stylebox_override("panel", P.panel(fill, color if phase == "listening" else P.LINE, 4, 10))
+	input_meter.value = speech.input_level if phase == "listening" else 0.0
+	if phase == "listening":
+		meter_caption.text = "收音音量 · 剩餘 %02d 秒" % speech.remaining_seconds
+	elif phase in ["stopping", "processing"]:
+		meter_caption.text = "正在停止收音" if phase == "stopping" else "麥克風已停止收音"
+	else:
+		meter_caption.text = "麥克風未開啟 · 最長收音 10 秒"
+
+
+func _style_microphone(listening: bool) -> void:
+	var normal: Color = Color("aa4334") if listening else P.ROOT
+	var hover: Color = Color("b24937") if listening else Color("fa9569")
+	var pressed: Color = Color("91382c") if listening else Color("e36b3b")
+	var face: Color = P.SCREEN_INK if listening else P.INK
+	microphone.add_theme_stylebox_override("normal", P.key(normal))
+	microphone.add_theme_stylebox_override("hover", P.key(hover))
+	microphone.add_theme_stylebox_override("pressed", P.key(pressed, true))
+	microphone.add_theme_stylebox_override("hover_pressed", P.key(pressed, true))
+	microphone.add_theme_stylebox_override("disabled", P.key(Color("e1e4d9")))
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+		microphone.add_theme_color_override(state, face)
+	microphone.add_theme_color_override("font_disabled_color", P.MUTED)
 
 
 func _exit_tree() -> void:

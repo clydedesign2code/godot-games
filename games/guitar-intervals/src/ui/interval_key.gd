@@ -22,7 +22,10 @@ func _draw() -> void:
 	var typeface: Font = glyph_font if glyph_font != null else get_theme_default_font()
 	draw_string(typeface, Vector2(12, 23), symbol, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, face)
 	draw_string(get_theme_default_font(), Vector2(12, size.y - 9), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, face)
-	var index_position := Vector2(size.x - 40, size.y - 9) if symbol.length() > 3 else Vector2(size.x - 32, 20)
+	# Measure the printed glyphs: character count misclassifies compact mMaj7
+	# and puts the index over its longer Chinese caption.
+	var symbol_width: float = typeface.get_string_size(symbol, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
+	var index_position := Vector2(size.x - 40, size.y - 9) if 12 + symbol_width > size.x - 40 else Vector2(size.x - 32, 20)
 	draw_string(typeface, index_position, index_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, secondary)
 	if button_pressed:
 		draw_circle(Vector2(size.x - 15, size.y - 13), 3, P.ROOT)

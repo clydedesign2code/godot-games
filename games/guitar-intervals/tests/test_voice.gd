@@ -31,6 +31,8 @@ func frames(count: int = 4) -> void:
 
 
 func click(control: Control, local_point: Vector2 = Vector2.INF) -> void:
+	if control is Button and not control.is_visible_in_tree() and control in app.mode_buttons:
+		await click(app.practice_nav_button)
 	var parent := control.get_parent()
 	while parent != null:
 		if parent is ScrollContainer:
@@ -132,7 +134,7 @@ func _run() -> void:
 	check(not quiz.complete and quiz.mistakes == initial_mistakes + 1 and quiz.heard.text.contains("C"), "Clear wrong note is displayed and counted once")
 	await result_file({"state": "result", "text": "Si", "confidence": 0.9})
 	check(quiz.complete and quiz.correct_count == 1 and not quiz.advance.is_stopped(), "Spoken fixed-do Si correctly answers B and schedules advancement")
-	check(quiz.readout.text.contains("B3") and quiz.board.markers.has(quiz.target), "Success reveals actual note name")
+	check(quiz.readout.text == "音名：B  ·  2 弦 0 品" and quiz.board.markers.has(quiz.target), "Success reveals actual note name")
 	await capture("voice-correct")
 	var old_target: Vector2i = quiz.target
 	await create_timer(1.85).timeout
@@ -164,7 +166,7 @@ func _run() -> void:
 	check(quiz.revealed and not quiz.complete and quiz.advance.is_stopped() and quiz.microphone.disabled, "Reveal is not scored or advanced")
 	await click(quiz.next_button)
 	await click(quiz.board, quiz.board.cell_center(quiz.target))
-	check(quiz.board.named_positions == [quiz.target] and quiz.readout.text.contains(Theory.note_name(quiz.target)), "Real board click displays the note inside the quiz circle")
+	check(quiz.board.named_positions == [quiz.target] and quiz.readout.text.contains(Theory.pitch_class_name(quiz.target)), "Real board click displays the note inside the quiz circle")
 	check(quiz.helped and not quiz.complete, "Inspecting the quiz circle marks assistance instead of grading")
 	await capture("voice-clicked-circle")
 	await click(quiz.next_button)

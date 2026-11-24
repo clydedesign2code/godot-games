@@ -6,17 +6,30 @@ const TonePlayer = preload("res://src/audio/tone_player.gd")
 const P = preload("res://src/ui/instrument_theme.gd")
 const IntervalKey = preload("res://src/ui/interval_key.gd")
 const Faceplate = preload("res://src/ui/faceplate.gd")
+const ExercisePanel = preload("res://src/ui/exercise_panel.gd")
 const VoiceQuiz = preload("res://src/voice/voice_quiz.gd")
+const InversionPractice = preload("res://src/trainer/inversion_practice.gd")
+const MODE_TITLES := ["查音程", "雙音練習", "和弦補音", "指板讀譜", "查和弦"]
 const MINT := P.SUCCESS
 const GOLD := P.TARGET
 const BLUE := P.FIFTH
 const MUTED := P.MUTED
 const RED := P.ERROR
 const AUTO_ADVANCE_DELAY: float = 1.6
+const DEGREE_NAMES: Dictionary = {1: "二度", 2: "三度", 3: "四度", 4: "五度", 5: "六度", 6: "七度"}
+const CHORD_GROUPS: Array[Dictionary] = [
+	{"id": "basic_sus", "name": "基礎／掛留"},
+	{"id": "seventh_sixth", "name": "七／六和弦"},
+]
 
-var mode: int = 0
+var mode: int = 4
+var last_practice_mode := 1
+var lookup_return: Dictionary = {}
 var root_position := Vector2i(4, 3)
 var interval_index: int = 4
+var selected_intervals: Array[int] = [4] # Lookup only.
+var lookup_interval_index: int = 4
+var practice_interval_index: int = 4
 var chord_index: int = 0
 var nearby: bool = true
 var picked: Array[Vector2i] = []
@@ -37,11 +50,22 @@ var auto_advance_timer: Timer
 
 var board: Control
 var mode_buttons: Array[Button] = []
+var practice_nav_button: Button
+var practice_tabs: HFlowContainer
+var page_scroll: ScrollContainer
+var page_margins: MarginContainer
+var header: BoxContainer
+var tuning: Label
+var scope_note: Label
+var lookup_actions: HFlowContainer
 var interval_choices: HFlowContainer
-var chord_choices: HFlowContainer
+var chord_choices: VBoxContainer
+var chord_sections: Array[HFlowContainer] = []
+var chord_section_labels: Array[Label] = []
 var interval_buttons: Array[Button] = []
 var chord_buttons: Array[Button] = []
 var choice_label: Label
+var keypad_help: Label
 var nearby_check: CheckButton
 var notes_check: CheckButton
 var root_label: Label
@@ -50,8 +74,8 @@ var note_readout: Label
 var eyebrow: Label
 var instruction_label: Label
 var formula_label: Label
+var theory_detail_label: Label
 var feedback_label: Label
-var stats_label: Label
 var hint_button: Button
 var reveal_button: Button
 var next_button: Button
@@ -65,12 +89,14 @@ var mono_font: Font
 var instrument_body: BoxContainer
 var volume_value: Label
 var voice_quiz: Control
+var inversion_practice: Control
 var interval_panels: Array[Control] = []
 var last_click_position := Vector2i(-1, -1)
 var last_click_scores: Array[int] = []
 
 
 func _ready() -> void:
+	preload("res://src/ui/window_layout.gd").configure(get_window())
 	rng.randomize()
 	auto_advance_timer = Timer.new()
 	auto_advance_timer.one_shot = true
@@ -84,11 +110,7 @@ func _ready() -> void:
 		board.sounding.clear()
 		board.queue_redraw()
 	)
-	_reset_question()
-
-
-func _style(color: Color, border: Color = P.LINE, radius: int = 5) -> StyleBoxFlat:
-	return P.panel(color, border, radius)
+	_set_mode(4)
 
 
 func _label(value: String, font_size: int = 16, color: Color = P.INK) -> Label:
@@ -196,15 +218,13 @@ func _build_ui() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
-	var scroll := ScrollContainer.new()
-	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
-	var margins := MarginContainer.new()
-	margins.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for edge in ["left", "right", "top", "bottom"]:
-		margins.add_theme_constant_override("margin_" + edge, 16)
-	scroll.add_child(margins)
+	page_scroll = ScrollContainer.new()
+	page_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(page_scroll)
+	page_margins = MarginContainer.new()
+	page_margins.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page_scroll.add_child(page_margins)
 	var faceplate := Faceplate.new()
 	faceplate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var case_style := P.panel(P.CASE, Color("aeb4a5"), 8, 18)
@@ -213,21 +233,23 @@ func _build_ui() -> void:
 	case_style.shadow_size = 7
 	case_style.shadow_offset = Vector2(0, 4)
 	faceplate.add_theme_stylebox_override("panel", case_style)
-	margins.add_child(faceplate)
+	page_margins.add_child(faceplate)
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 10)
 	faceplate.add_child(content)
-	var header := _row(content)
+	header = BoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	content.add_child(header)
 	var brand := VBoxContainer.new()
 	brand.add_theme_constant_override("separation", 0)
 	header.add_child(brand)
 	brand.add_child(_mono("FR–12", 32, P.INK))
-	brand.add_child(_label("FRET RELATIONS  /  指板音程練習器", 12, P.MUTED))
-	_spacer(header)
+	brand.add_child(_label("FRET RELATIONS  /  吉他指板查閱", 12, P.MUTED))
+	brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var header_info := VBoxContainer.new()
 	header_info.add_theme_constant_override("separation", 3)
 	header.add_child(header_info)
-	var tuning := _mono("STANDARD TUNING    E · A · D · G · B · e", 11)
+	tuning = _mono("標準調弦    E · A · D · G · B · e", 11)
 	tuning.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	header_info.add_child(tuning)
 	var sound_controls := _row(header_info, 8)
@@ -236,10 +258,10 @@ func _build_ui() -> void:
 		tone_player.set_muted(not tone_player.muted)
 		mute_button.text = "○ 靜音" if tone_player.muted else "● 聲音開"
 	)
-	mute_button.custom_minimum_size.y = 34
+	mute_button.custom_minimum_size.y = 44
 	mute_button.tooltip_text = "切換試聽聲音；靜音會立即停止播放。"
 	sound_controls.add_child(mute_button)
-	sound_controls.add_child(_mono("OUTPUT", 10))
+	sound_controls.add_child(_label("音量", 12, P.MUTED))
 	volume_slider = HSlider.new()
 	volume_slider.min_value = 0
 	volume_slider.max_value = 100
@@ -256,13 +278,25 @@ func _build_ui() -> void:
 		volume_value.text = "%02d" % int(value)
 	)
 	var tabs := _row(content, 8)
-	for index in range(4):
-		var button := _button(["01  音程查閱", "02  雙音練習", "03  三和弦練習", "04  口說讀譜"][index], _set_mode.bind(index))
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	practice_tabs = HFlowContainer.new()
+	practice_tabs.add_theme_constant_override("h_separation", 8)
+	content.add_child(practice_tabs)
+	mode_buttons.resize(MODE_TITLES.size())
+	for index in [4, 0, 1, 2, 3]:
+		var button := _button(MODE_TITLES[index], _navigate.bind(index))
 		button.toggle_mode = true
-		tabs.add_child(button)
-		mode_buttons.append(button)
-	var toolbar := _row(content, 10)
+		if index in [4, 0]:
+			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			tabs.add_child(button)
+		else:
+			practice_tabs.add_child(button)
+		mode_buttons[index] = button
+	practice_nav_button = _button("練習", func() -> void: _navigate(last_practice_mode))
+	practice_nav_button.toggle_mode = true
+	tabs.add_child(practice_nav_button)
+	var toolbar := HFlowContainer.new()
+	toolbar.add_theme_constant_override("h_separation", 12)
+	content.add_child(toolbar)
 	interval_panels.append(toolbar)
 	root_label = _mono("", 17, P.INK)
 	toolbar.add_child(root_label)
@@ -270,7 +304,6 @@ func _build_ui() -> void:
 	root_placement_button.toggle_mode = true
 	root_placement_button.tooltip_text = "可直接雙擊指板設定根音；也可按此鍵後單擊選定。"
 	toolbar.add_child(root_placement_button)
-	_spacer(toolbar)
 	nearby_check = CheckButton.new()
 	nearby_check.text = "±4 品範圍"
 	nearby_check.button_pressed = true
@@ -294,21 +327,25 @@ func _build_ui() -> void:
 	var board_content := VBoxContainer.new()
 	board_content.add_theme_constant_override("separation", 6)
 	board_panel.add_child(board_content)
-	var board_header := _row(board_content, 8)
+	var board_header := HFlowContainer.new()
+	board_header.add_theme_constant_override("h_separation", 12)
+	board_content.add_child(board_header)
 	board_instruction_label = _label("", 12, P.SCREEN_MUTED)
 	board_header.add_child(board_instruction_label)
-	_spacer(board_header)
 	board_header.add_child(_label("● 根音", 12, P.ROOT))
 	board_header.add_child(_label("● 目標音", 12, P.TARGET))
-	board_header.add_child(_label("● 五度", 12, P.FIFTH))
+	board_header.add_child(_label("● 五／六／七度", 12, P.FIFTH))
 	board = Board.new()
 	board.add_theme_font_override("font", mono_font)
 	board.note_pressed.connect(_on_note_pressed)
 	board.root_requested.connect(_on_root_requested)
 	board_content.add_child(board)
-	note_readout = _mono("點選指板，查看音名與八度", 17, P.SCREEN_INK)
+	note_readout = _mono("點選指板，查看音名與弦品", 17, P.SCREEN_INK)
 	note_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	board_content.add_child(note_readout)
+	lookup_actions = HFlowContainer.new()
+	lookup_actions.add_theme_constant_override("h_separation", 12)
+	board_content.add_child(lookup_actions)
 	var board_note := _label("1 弦在上方 · 6 弦在下方   /   G → B：4 半音，其餘相鄰弦：5 半音", 11, P.SCREEN_MUTED)
 	board_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	board_content.add_child(board_note)
@@ -325,7 +362,6 @@ func _build_ui() -> void:
 	interval_choices.add_theme_constant_override("h_separation", 6)
 	interval_choices.add_theme_constant_override("v_separation", 6)
 	keypad_content.add_child(interval_choices)
-	var interval_group := ButtonGroup.new()
 	interval_buttons.resize(Theory.INTERVALS.size())
 	for index in [0, 5, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11]:
 		var interval: Dictionary = Theory.INTERVALS[index]
@@ -336,72 +372,70 @@ func _build_ui() -> void:
 		button.glyph_font = mono_font
 		button.custom_minimum_size = Vector2(112, 48)
 		button.toggle_mode = true
-		button.button_group = interval_group
-		button.tooltip_text = "%s · 向上 %d 半音（按音級比較）" % [interval.name, interval.semitones]
+		button.tooltip_text = "%s · 向上 %d 半音。" % [interval.name, interval.semitones]
 		button.pressed.connect(_on_interval_changed.bind(index))
 		interval_choices.add_child(button)
 		interval_buttons[index] = button
-	chord_choices = HFlowContainer.new()
-	chord_choices.add_theme_constant_override("h_separation", 6)
-	chord_choices.add_theme_constant_override("v_separation", 6)
+	chord_choices = VBoxContainer.new()
+	chord_choices.add_theme_constant_override("separation", 10)
 	keypad_content.add_child(chord_choices)
+	# One shared ButtonGroup preserves single selection across both sections.
 	var chord_group := ButtonGroup.new()
-	for index in range(Theory.TRIADS.size()):
-		var chord: Dictionary = Theory.TRIADS[index]
-		var button := IntervalKey.new()
-		button.symbol = chord.formula.replace(" ", "")
-		button.caption = chord.name
-		button.index_text = "%02d" % (index + 1)
-		button.glyph_font = mono_font
-		button.custom_minimum_size = Vector2(112, 64)
-		button.toggle_mode = true
-		button.button_group = chord_group
-		button.tooltip_text = "%s · %s" % [chord.name, chord.formula]
-		button.pressed.connect(_on_chord_changed.bind(index))
-		chord_choices.add_child(button)
-		chord_buttons.append(button)
-	var keypad_help := _label("先選根音，再選音程。\n點指板，把位置與聽感連起來。", 12, P.MUTED)
+	chord_buttons.resize(Theory.CHORDS.size())
+	for group_index in range(CHORD_GROUPS.size()):
+		var group: Dictionary = CHORD_GROUPS[group_index]
+		if group_index > 0:
+			chord_choices.add_child(HSeparator.new())
+		var heading := _mono("%02d / %s" % [group_index + 1, group.name], 12, P.INK)
+		chord_choices.add_child(heading)
+		chord_section_labels.append(heading)
+		var keys := HFlowContainer.new()
+		keys.add_theme_constant_override("h_separation", 6)
+		keys.add_theme_constant_override("v_separation", 6)
+		chord_choices.add_child(keys)
+		chord_sections.append(keys)
+		for index in range(Theory.CHORDS.size()):
+			var chord: Dictionary = Theory.CHORDS[index]
+			if chord.group != group.id:
+				continue
+			var button := IntervalKey.new()
+			button.symbol = chord.suffix if chord.omit_fifth or chord.steps[0] != 2 else chord.formula.replace(" ", "")
+			button.caption = chord.name
+			button.index_text = "%02d" % (index + 1)
+			button.glyph_font = mono_font
+			button.custom_minimum_size = Vector2(112, 56)
+			button.toggle_mode = true
+			button.button_group = chord_group
+			button.tooltip_text = "%s · 完整 %s\n本題 %s%s" % [chord.name, chord.formula, chord.voicing_formula, "（省略五度）" if chord.omit_fifth else ""]
+			button.pressed.connect(_on_chord_changed.bind(index))
+			keys.add_child(button)
+			chord_buttons[index] = button
+	keypad_help = _label("", 12, P.MUTED)
 	keypad_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	keypad_content.add_child(keypad_help)
-	task_panel = PanelContainer.new()
-	task_panel.add_theme_stylebox_override("panel", P.panel(P.CASE, P.LINE, 4, 12))
+	task_panel = ExercisePanel.new()
+	task_panel.mono_font = mono_font
 	content.add_child(task_panel)
+	task_panel.practice_button.reparent(lookup_actions, false)
 	interval_panels.append(task_panel)
-	var task_content := VBoxContainer.new()
-	task_content.add_theme_constant_override("separation", 5)
-	task_panel.add_child(task_content)
-	var task_header := _row(task_content)
-	eyebrow = _mono("", 11)
-	task_header.add_child(eyebrow)
-	_spacer(task_header)
-	stats_label = _mono("", 11)
-	task_header.add_child(stats_label)
-	instruction_label = _label("", 22)
-	instruction_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	task_content.add_child(instruction_label)
-	formula_label = _mono("", 13, Color("3d657c"))
-	formula_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	task_content.add_child(formula_label)
-	feedback_label = _label("", 14, P.MUTED)
-	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_label.custom_minimum_size.y = 28
-	task_content.add_child(feedback_label)
-	var actions := _row(task_content, 8)
-	hint_button = _button("位置提示", _hint)
-	actions.add_child(hint_button)
-	reveal_button = _button("查看答案", _reveal)
-	actions.add_child(reveal_button)
-	play_root_button = _button("播放根音", func() -> void: _play_positions([root_position]))
-	actions.add_child(play_root_button)
-	play_group_button = _button("播放雙音", _play_group)
-	actions.add_child(play_group_button)
-	_spacer(actions)
-	next_button = _button("下一題 →", _new_question)
-	next_button.custom_minimum_size.x = 168
-	next_button.add_theme_stylebox_override("normal", P.key(P.ROOT))
-	next_button.add_theme_stylebox_override("hover", P.key(Color("fa9569")))
-	actions.add_child(next_button)
-	var scope_note := _label("音級關係含不同八度與低於根音的位置。點音會顯示實際音名；完整答對後自動進入下一題。", 11, P.MUTED)
+	eyebrow = task_panel.eyebrow
+	instruction_label = task_panel.instruction_label
+	formula_label = task_panel.formula_label
+	theory_detail_label = task_panel.theory_detail_label
+	feedback_label = task_panel.feedback_label
+	hint_button = task_panel.hint_button
+	reveal_button = task_panel.reveal_button
+	play_root_button = task_panel.play_root_button
+	play_group_button = task_panel.play_group_button
+	next_button = task_panel.next_button
+	task_panel.hint_requested.connect(_hint)
+	task_panel.reveal_requested.connect(_reveal)
+	task_panel.play_root_requested.connect(func() -> void: _play_positions([root_position]))
+	task_panel.play_group_requested.connect(_play_group)
+	task_panel.next_requested.connect(_new_question)
+	task_panel.practice_requested.connect(_practice_lookup)
+	task_panel.return_requested.connect(_navigate.bind(0))
+	scope_note = _label("音級關係含不同八度與低於根音的位置。點音會顯示實際音名；完整答對後自動進入下一題。", 11, P.MUTED)
 	scope_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	content.add_child(scope_note)
 	interval_panels.append(scope_note)
@@ -409,6 +443,11 @@ func _build_ui() -> void:
 	voice_quiz.tone_player = tone_player
 	voice_quiz.mono_font = mono_font
 	content.add_child(voice_quiz)
+	inversion_practice = InversionPractice.new()
+	inversion_practice.tone_player = tone_player
+	inversion_practice.mono_font = mono_font
+	inversion_practice.visible = false
+	content.add_child(inversion_practice)
 	resized.connect(_update_instrument_layout)
 	_update_instrument_layout()
 
@@ -416,27 +455,98 @@ func _build_ui() -> void:
 func _update_instrument_layout() -> void:
 	if is_instance_valid(instrument_body):
 		instrument_body.vertical = size.x < 1180.0
+		header.vertical = size.x < 560
+		tuning.visible = size.x >= 560
+		var margin := 6 if size.x < 650 else 16
+		for edge in ["left", "right", "top", "bottom"]:
+			page_margins.add_theme_constant_override("margin_" + edge, margin)
+
+
+func _navigate(value: int) -> void:
+	if value == mode:
+		mode_buttons[value].set_pressed_no_signal(true)
+		practice_nav_button.set_pressed_no_signal(practice_tabs.visible)
+		if value == 4:
+			inversion_practice.return_to_lookup()
+		return
+	_set_mode(value)
+
+
+func _practice_lookup() -> void:
+	if mode != 0:
+		return
+	lookup_return = {
+		"root": root_position, "nearby": nearby, "target": audition_target,
+		"practice_interval": practice_interval_index,
+	}
+	practice_interval_index = interval_index
+	_set_mode(1)
 
 
 func _set_mode(value: int) -> void:
+	if mode == 0:
+		lookup_interval_index = interval_index
+	elif mode == 1:
+		practice_interval_index = interval_index
 	mode = value
+	var returning := mode == 0 and not lookup_return.is_empty()
+	if returning:
+		root_position = lookup_return.root
+		nearby = lookup_return.nearby
+		nearby_check.set_pressed_no_signal(nearby)
+	if mode == 0:
+		interval_index = lookup_interval_index
+	elif mode == 1:
+		interval_index = practice_interval_index
 	placing_root = false
 	auto_advance_timer.stop()
 	tone_player.stop()
 	voice_quiz.set_active(mode == 3)
+	inversion_practice.set_active(mode == 4)
+	if mode == 4:
+		inversion_practice.return_to_lookup()
+	practice_tabs.visible = mode in [1, 2, 3]
+	practice_nav_button.set_pressed_no_signal(practice_tabs.visible)
+	if practice_tabs.visible:
+		last_practice_mode = mode
 	for panel in interval_panels:
-		panel.visible = mode != 3
+		panel.visible = mode < 3
+	task_panel.show_lookup_actions(lookup_actions, mode == 0)
 	for index in range(mode_buttons.size()):
 		mode_buttons[index].set_pressed_no_signal(index == mode)
-	if mode == 3:
+	page_scroll.scroll_vertical = 0
+	if mode >= 3:
 		return
 	_reset_question()
+	if returning:
+		audition_target = lookup_return.target
+		practice_interval_index = lookup_return.practice_interval
+		lookup_return.clear()
+		_refresh()
 
 
 func _on_interval_changed(value: int) -> void:
-	if interval_index == value:
+	if mode == 1:
+		if interval_index == value:
+			_refresh()
+			return
+		interval_index = value
+		_reset_question()
 		return
-	interval_index = value
+	if mode != 0:
+		return
+	if selected_intervals.has(value):
+		if selected_intervals.size() == 1:
+			# Keep one usable choice and preserve the current answer/listening state.
+			_refresh()
+			return
+		selected_intervals.erase(value)
+		if interval_index == value:
+			interval_index = selected_intervals[0]
+	else:
+		selected_intervals.append(value)
+		selected_intervals.sort()
+		interval_index = value
 	_reset_question()
 
 
@@ -448,12 +558,18 @@ func _on_chord_changed(value: int) -> void:
 
 
 func _reset_question() -> void:
+	if mode == 0 and not selected_intervals.has(interval_index):
+		interval_index = selected_intervals[0]
+	if mode == 0:
+		lookup_interval_index = interval_index
+	elif mode == 1:
+		practice_interval_index = interval_index
 	auto_advance_timer.stop()
 	last_click_position = Vector2i(-1, -1)
 	last_click_scores.clear()
 	placing_root = false
 	tone_player.stop()
-	note_readout.text = "點選指板，查看音名與八度"
+	note_readout.text = "點選指板，查看音名與弦品"
 	board.named_positions.clear()
 	picked.clear()
 	audition_target = Vector2i(-1, -1)
@@ -464,12 +580,12 @@ func _reset_question() -> void:
 	feedback = "先選音程，再單擊指板試聽；雙擊任一位置即可設定根音。" if mode == 0 else "先觀察根音，再單擊你認為正確的位置；雙擊可重新設定根音。"
 	feedback_color = MUTED
 	if mode == 2 and _voicings().is_empty():
-		feedback = "此根音與範圍沒有符合條件的三和弦。請更換根音，或關閉 ±4 品限制。"
+		feedback = "此根音與範圍沒有符合條件的三音配置。請更換根音，或關閉 ±4 品限制。"
 	_refresh()
 
 
 func _voicings() -> Array[Array]:
-	return Theory.triad_voicings(root_position, chord_index, nearby)
+	return Theory.chord_voicings(root_position, chord_index, nearby)
 
 
 func _compatible_voicings() -> Array[Array]:
@@ -485,6 +601,11 @@ func _compatible_voicings() -> Array[Array]:
 
 
 func _valid_answers() -> Array[Vector2i]:
+	if mode == 0:
+		var positions: Array[Vector2i] = []
+		for interval in selected_intervals:
+			positions.append_array(Theory.candidates(root_position, interval, nearby))
+		return positions
 	if mode != 2:
 		return Theory.candidates(root_position, interval_index, nearby)
 	var result: Array[Vector2i] = []
@@ -496,7 +617,7 @@ func _valid_answers() -> Array[Vector2i]:
 
 
 func _on_root_requested(position: Vector2i) -> void:
-	if mode == 3 or not Theory.is_position_valid(position):
+	if mode >= 3 or not Theory.is_position_valid(position):
 		return
 	# A native double-click includes an ordinary first click. Undo only its score
 	# changes, so selecting a root cannot add a wrong answer or a completion.
@@ -506,7 +627,7 @@ func _on_root_requested(position: Vector2i) -> void:
 		mistake_count = last_click_scores[2]
 	root_position = position
 	_reset_question()
-	feedback = "根音已設為 %s · %d 弦 %d 品。" % [Theory.note_name(position), position.x + 1, position.y]
+	feedback = "根音已設為 %s · %d 弦 %d 品。" % [Theory.pitch_class_name(position), position.x + 1, position.y]
 	_refresh()
 	_play_positions([position])
 
@@ -520,9 +641,12 @@ func _on_note_pressed(position: Vector2i) -> void:
 		_play_positions([position])
 		return
 	if mode == 0:
-		if position != root_position and Theory.in_scope(root_position, position, nearby) and Theory.relative_pc(root_position, position) == interval_index:
+		var relative: int = Theory.relative_pc(root_position, position)
+		if position != root_position and Theory.in_scope(root_position, position, nearby) and selected_intervals.has(relative):
 			audition_target = position
-		feedback = "單音 %s · %d 弦 %d 品。%s。" % [Theory.note_name(position), position.x + 1, position.y, Theory.movement(root_position, position)]
+			interval_index = relative
+			lookup_interval_index = relative
+		feedback = "單音 %s · %d 弦 %d 品。%s。" % [Theory.pitch_class_name(position), position.x + 1, position.y, Theory.movement(root_position, position)]
 		feedback_color = MUTED
 		_refresh()
 		_play_positions([position])
@@ -567,15 +691,17 @@ func _on_note_pressed(position: Vector2i) -> void:
 		mistake_count += 1
 		feedback_color = RED
 		var relative: int = Theory.relative_pc(root_position, position)
-		if mode == 2 and Theory.TRIADS[chord_index].tones.has(relative):
+		if mode == 2 and Theory.CHORDS[chord_index].omit_fifth and relative == 7:
+			feedback = "這是五度音，本題省略五度。請補上三度與%s，共三音。" % ("六度" if Theory.CHORDS[chord_index].steps[1] == 5 else "七度")
+		elif mode == 2 and Theory.CHORDS[chord_index].tones.has(relative):
 			feedback = "音級正確，但無法與目前選擇組成三弦指型：每弦只能一音，按弦跨度最多 4 品。可取消已選音再試。"
 		else:
-			feedback = "這裡是 %s，與根音相差 %+d 半音，音級關係為 %s。再試一次。" % [Theory.note_name(position), Theory.midi(position) - Theory.midi(root_position), Theory.INTERVALS[relative].name]
+			feedback = "這裡是 %s，與根音相差 %+d 半音，音級關係為 %s。再試一次。" % [Theory.pitch_class_name(position), Theory.midi(position) - Theory.midi(root_position), Theory.INTERVALS[relative].name]
 	_refresh()
 
 
 func _advance_after_success() -> void:
-	if mode != 0 and question_complete and not revealed and not placing_root:
+	if mode in [1, 2] and question_complete and not revealed and not placing_root:
 		_new_question()
 
 
@@ -619,7 +745,7 @@ func _play_positions(positions: Array[Vector2i]) -> void:
 	var note_descriptions: Array[String] = []
 	for position in positions:
 		notes.append(Theory.midi(position))
-		note_descriptions.append("%s（%d 弦 · %d 品）" % [Theory.note_name(position), position.x + 1, position.y])
+		note_descriptions.append("%s（%d 弦 · %d 品）" % [Theory.pitch_class_name(position), position.x + 1, position.y])
 	# Keep note identity visible after playback, even when muted or in practice.
 	note_readout.text = ("音名：" if positions.size() == 1 else "合奏音名：") + " ＋ ".join(note_descriptions)
 	board.named_positions.assign(positions)
@@ -637,7 +763,7 @@ func _play_group() -> void:
 	if mode == 0:
 		var names: Array[String] = []
 		for position in positions:
-			names.append("%s（%d 弦 %d 品）" % [Theory.note_name(position), position.x + 1, position.y])
+			names.append("%s（%d 弦 %d 品）" % [Theory.pitch_class_name(position), position.x + 1, position.y])
 		feedback = "同時試聽：" + " ＋ ".join(names) + "。白色外圈標出實際發聲位置。"
 		feedback_color = MUTED
 		_refresh()
@@ -661,7 +787,7 @@ func _reveal() -> void:
 		var voicings: Array[Array] = _compatible_voicings()
 		if not voicings.is_empty():
 			picked.assign(voicings[0])
-		feedback = "顯示一組可彈奏的答案；也可以使用其他符合音級與跨度的指型。點下一題再練一次。"
+		feedback = "顯示一組三音位置；也可以使用其他符合音級與跨度的配置。點下一題再練一次。"
 	else:
 		feedback = "已顯示所有符合範圍的答案。選一個位置記住它與根音的位移，再點下一題。"
 	feedback_color = P.INFO
@@ -675,7 +801,7 @@ func _new_question() -> void:
 			var position := Vector2i(string_index, fret)
 			if position == root_position:
 				continue
-			if mode == 2 and Theory.triad_voicings(position, chord_index, nearby).is_empty():
+			if mode == 2 and Theory.chord_voicings(position, chord_index, nearby).is_empty():
 				continue
 			if mode != 2 and Theory.candidates(position, interval_index, nearby).is_empty():
 				continue
@@ -687,32 +813,54 @@ func _new_question() -> void:
 
 func _tone_symbol(relative: int) -> String:
 	if mode == 2:
-		var chord: Dictionary = Theory.TRIADS[chord_index]
+		var chord: Dictionary = Theory.CHORDS[chord_index]
 		var index: int = chord.tones.find(relative)
 		if index >= 0:
 			return chord.symbols[index]
 	return Theory.INTERVALS[relative].symbol
 
 
+func _tone_card(position: Vector2i, role: String, color: Color, given: bool = false) -> Dictionary:
+	var known: bool = Theory.is_position_valid(position)
+	return {
+		"role": role,
+		"value": Theory.pitch_class_name(position) if known else "？",
+		"state": ("已給定" if given else "%d 弦 %d 品" % [position.x + 1, position.y]) if known else "等待選音",
+		"known": known,
+		"color": color
+	}
+
+
 func _refresh() -> void:
-	if not is_instance_valid(board) or mode == 3:
+	if not is_instance_valid(board) or mode >= 3:
 		return
 	for index in range(mode_buttons.size()):
 		mode_buttons[index].set_pressed_no_signal(index == mode)
 	for index in range(interval_buttons.size()):
-		interval_buttons[index].set_pressed_no_signal(index == interval_index)
+		interval_buttons[index].set_pressed_no_signal(selected_intervals.has(index) if mode == 0 else index == interval_index)
 	for index in range(chord_buttons.size()):
 		chord_buttons[index].set_pressed_no_signal(index == chord_index)
 	interval_choices.visible = mode != 2
 	chord_choices.visible = mode == 2
-	choice_label.text = "02 / CHORD · 和弦" if mode == 2 else "02 / INTERVAL · 音程"
+	choice_label.text = "和弦・單選" if mode == 2 else ("音程・複選" if mode == 0 else "音程・單選")
+	if mode == 0:
+		keypad_help.text = "可複選，再點一次取消。\n至少保留一項；點指板比較聽感。"
+	elif mode == 1:
+		keypad_help.text = "單選一個音程。\n根音＋一個目標音，共兩音。"
+	else:
+		keypad_help.text = "兩組共用單選，每題三音。\n基礎／掛留：保留五度。\n七／六和弦：省略五度。"
 	notes_check.disabled = mode != 0
 	root_placement_button.set_pressed_no_signal(placing_root)
 	root_placement_button.text = "取消選根音" if placing_root else "在指板選根音"
 	var group: Array[Vector2i] = _group_positions()
 	play_group_button.disabled = group.size() < 2
-	play_group_button.text = "播放三和弦" if group.size() == 3 else "播放雙音"
-	play_group_button.tooltip_text = "同時播放根音與已選的音；三和弦尚未選滿時，可先聽雙音。"
+	play_group_button.text = "播放三音" if group.size() == 3 else "播放雙音"
+	play_group_button.tooltip_text = "同時播放根音與已選的音；尚未選滿時，可先聽雙音。"
+	if mode == 0:
+		var interval_name: String = Theory.INTERVALS[interval_index].name
+		play_group_button.text = "試聽%s" % interval_name
+		play_group_button.tooltip_text = "同時播放根音與指板上圈選的%s。" % interval_name
+		task_panel.practice_button.tooltip_text = "沿用目前根音，練習找%s。" % interval_name
 	board.listening_target = audition_target if not placing_root and (mode == 0 or (mode == 1 and revealed)) else Vector2i(-1, -1)
 	board.root = root_position
 	board.nearby = nearby and not placing_root
@@ -721,11 +869,17 @@ func _refresh() -> void:
 	board.conceal_answers = mode != 0 and not revealed and not question_complete and not placing_root
 	board.markers.clear()
 	if mode == 0 or (mode == 1 and revealed):
-		for position in Theory.candidates(root_position, interval_index, nearby):
-			board.markers[position] = {"text": _tone_symbol(interval_index), "color": GOLD}
+		var shown: Array[int] = []
+		if mode == 0:
+			shown.assign(selected_intervals)
+		else:
+			shown.append(interval_index)
+		for interval in shown:
+			for position in Theory.candidates(root_position, interval, nearby):
+				board.markers[position] = {"text": _tone_symbol(interval), "color": BLUE if mode == 0 and interval == 7 and shown.size() > 1 else GOLD}
 	for position in picked:
 		var relative: int = Theory.relative_pc(root_position, position)
-		var color: Color = BLUE if mode == 2 and relative == Theory.TRIADS[chord_index].tones[1] else GOLD
+		var color: Color = BLUE if mode == 2 and relative == Theory.CHORDS[chord_index].tones[1] else GOLD
 		board.markers[position] = {"text": _tone_symbol(relative), "color": color}
 	if Theory.is_position_valid(wrong_position):
 		board.markers[wrong_position] = {"text": "×", "color": RED}
@@ -733,39 +887,90 @@ func _refresh() -> void:
 		board.markers.clear()
 	board.queue_redraw()
 	var root_name: String = Theory.root_name(root_position)
-	root_label.text = "根音  %s   ·   %d 弦 %d 品" % [Theory.note_name(root_position), root_position.x + 1, root_position.y]
+	root_label.text = "根音  %s   ·   %d 弦 %d 品" % [Theory.pitch_class_name(root_position), root_position.x + 1, root_position.y]
 	board_instruction_label.text = "選根音：直接點選指板位置" if placing_root else ("單擊試聽 · 雙擊設根音" if mode == 0 else "單擊作答／試聽 · 雙擊設根音")
 	board_instruction_label.add_theme_color_override("font_color", P.ROOT if placing_root else P.SCREEN_MUTED)
-	eyebrow.text = ["EXPLORE / 看見相對位置", "DYAD / 從一個音找到另一個音", "TRIAD / 用音程組成和弦"][mode]
-	if mode != 2:
+	eyebrow.text = ["", "雙音練習", "和弦補音"][mode]
+	eyebrow.visible = mode != 0
+	scope_note.visible = mode != 0
+	var structure: Array[Dictionary] = []
+	task_panel.composition_label.text = "和弦組成" if mode == 2 else "音程關係"
+	task_panel.full_composition_label.visible = mode == 2
+	task_panel.voicing_label.visible = mode == 2
+	if mode == 0 and selected_intervals.size() > 1:
+		var symbols: Array[String] = []
+		var names: Array[String] = []
+		for index in selected_intervals:
+			var interval: Dictionary = Theory.INTERVALS[index]
+			symbols.append(interval.symbol)
+			names.append(Theory.spelled_note(root_position, interval.semitones, interval.letter_steps))
+		instruction_label.text = "%s：同時查閱 %d 種音程" % [root_name, selected_intervals.size()]
+		formula_label.text = "R → " + " / ".join(symbols)
+		theory_detail_label.text = "%s → %s\n範圍內有 %d 個位置" % [root_name, " / ".join(names), _valid_answers().size()]
+		task_panel.progress_label.text = "已選 %d 種" % selected_intervals.size()
+	elif mode != 2:
 		var interval: Dictionary = Theory.INTERVALS[interval_index]
-		var target: String = Theory.spelled_note(root_position, interval.semitones, interval.letter_steps)
-		instruction_label.text = "%s 的%s，在哪裡？" % [root_name, interval.name]
-		formula_label.text = "R → %s  ·  %s → %s  ·  向上 %d 半音（以八度為循環）" % [interval.symbol, root_name, target if mode == 0 or revealed or question_complete else "？", interval.semitones]
+		instruction_label.text = ("%s 的%s位置" if mode == 0 else "%s 的%s，在哪裡？") % [root_name, interval.name]
+		formula_label.text = "%s  ·  R → %s" % [interval.name, interval.symbol]
+		theory_detail_label.text = "向上 %d 半音 · 以八度為循環" % interval.semitones
 		if interval_index == 0:
-			formula_label.text = "R → 1 / 8  ·  同音級可相差 0、±12、±24…半音；不包含已給定的根音位置"
+			theory_detail_label.text = "相差 0、±12、±24…半音；不含原根音位置"
 		if mode == 0:
-			formula_label.text += "  ·  範圍內有 %d 個位置" % Theory.candidates(root_position, interval_index, nearby).size()
+			theory_detail_label.text += " · %d 個位置" % Theory.candidates(root_position, interval_index, nearby).size()
+		var target_position := Vector2i(-1, -1)
+		if mode == 0 or revealed:
+			target_position = audition_target
+		elif not picked.is_empty():
+			target_position = picked[0]
+		if mode != 0:
+			structure.append(_tone_card(root_position, "根音 · R", P.ROOT, true))
+			structure.append(_tone_card(target_position, "目標音 · " + interval.symbol, P.INFO))
+		task_panel.progress_label.text = "查閱" if mode == 0 else "已選 %d / 1 音" % picked.size()
 	else:
-		var chord: Dictionary = Theory.TRIADS[chord_index]
-		instruction_label.text = "組成 %s%s：補上三度與五度" % [root_name, chord.suffix]
-		var notes: Array[String] = [root_name]
+		var chord: Dictionary = Theory.CHORDS[chord_index]
+		instruction_label.text = "組成 %s %s" % [root_name, chord.name]
+		if chord.omit_fifth or chord.steps[0] != 2:
+			instruction_label.text = "%s%s：補上%s與%s" % [root_name, chord.suffix, DEGREE_NAMES[chord.steps[0]], DEGREE_NAMES[chord.steps[1]]]
+		var notes: Array[String] = Theory.chord_note_names(root_position, chord_index, true)
+		structure.append(_tone_card(root_position, "根音 · 1", P.ROOT, true))
 		for index in range(2):
-			notes.append(Theory.spelled_note(root_position, chord.tones[index], chord.steps[index]))
-		formula_label.text = "%s  ·  %s  ·  已選 %d / 2 音" % [chord.name, chord.formula, picked.size()]
-		if revealed or question_complete:
-			formula_label.text += "  ·  " + " – ".join(notes)
+			var position := Vector2i(-1, -1)
+			for chosen in picked:
+				if Theory.relative_pc(root_position, chosen) == chord.tones[index]:
+					position = chosen
+					break
+			var role: String = DEGREE_NAMES[chord.steps[index]]
+			structure.append(_tone_card(position, role + " · " + chord.symbols[index], P.INFO if index == 0 else P.SUCCESS))
+		formula_label.text = "%s  ·  %s" % [chord.name, chord.formula]
+		task_panel.full_composition_label.text = "完整組成：%s" % " – ".join(Theory.chord_note_names(root_position, chord_index))
+		task_panel.voicing_label.text = "本題三音：%s  ·  %s" % [chord.voicing_formula, " – ".join(notes)]
+		if chord.omit_fifth:
+			task_panel.voicing_label.text += "\n省略五度（5）：%s；保留根音、三度與%s。" % [Theory.spelled_note(root_position, 7, 4), "六度" if chord.steps[1] == 5 else "七度"]
+		elif chord.steps[0] != 2:
+			task_panel.voicing_label.text += "\n以%s取代三度，保留根音與五度。" % DEGREE_NAMES[chord.steps[0]]
+		theory_detail_label.text = "每弦一音 · 按弦跨度最多 4 品"
+		task_panel.progress_label.text = "已選 %d / 2 音" % picked.size()
+	task_panel.set_structure(structure)
 	var show_success: bool = question_complete and not placing_root
+	var feedback_state: String = "查閱中" if mode == 0 else "等待作答"
 	if placing_root:
 		instruction_label.text = "請在指板點選一個根音"
+		feedback_state = "設定根音"
 	elif show_success:
-		instruction_label.text = "✓ 答對了！"
-	instruction_label.add_theme_color_override("font_color", P.SUCCESS if show_success else P.INK)
-	task_panel.add_theme_stylebox_override("panel", _style(Color("e1ebd7") if show_success else P.CASE, P.SUCCESS if show_success else P.LINE, 4))
-	feedback_label.text = "直接點選指板位置即可設定根音；按「取消選根音」回到原題。" if placing_root else feedback
-	feedback_label.add_theme_color_override("font_color", MUTED if placing_root else feedback_color)
-	stats_label.text = "獨立完成 %d 題  ·  提示完成 %d 題  ·  錯點 %d 次" % [completed_count, assisted_count, mistake_count]
-	stats_label.visible = mode != 0
+		feedback_state = "✓ 答對了！"
+	elif revealed:
+		feedback_state = "已顯示答案"
+	elif feedback_color == RED:
+		feedback_state = "再試一次"
+	elif help_used:
+		feedback_state = "位置提示"
+	elif not picked.is_empty():
+		feedback_state = "繼續選音"
+	instruction_label.add_theme_color_override("font_color", P.INK)
+	task_panel.set_feedback(feedback_state, "直接點選指板位置即可設定根音；按「取消選根音」回到原題。" if placing_root else feedback, MUTED if placing_root else feedback_color, show_success)
+	var statistics: Array[int] = [completed_count, assisted_count, mistake_count]
+	task_panel.set_statistics(statistics, mode != 0)
+	task_panel.return_button.visible = mode == 1 and not lookup_return.is_empty()
 	hint_button.visible = mode != 0
 	reveal_button.visible = mode != 0
 	var no_answers: bool = _valid_answers().is_empty()

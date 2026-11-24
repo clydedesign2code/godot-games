@@ -8,6 +8,7 @@ signal playback_ended
 const SAMPLE_RATE: int = 44100
 const DURATION: float = 1.6
 const PEAK: float = 0.72
+const MAX_VOICES: int = 4
 const CACHE_LIMIT: int = 48
 const HARMONICS: Array[float] = [1.0, 0.28, 0.12, 0.05]
 
@@ -57,7 +58,7 @@ func _tone(midi_note: int) -> PackedFloat32Array:
 
 
 func stream_for(midi_notes: Array[int]) -> AudioStreamWAV:
-	if midi_notes.is_empty() or midi_notes.size() > 3:
+	if midi_notes.is_empty() or midi_notes.size() > MAX_VOICES:
 		return null
 	for note in midi_notes:
 		if note < 0 or note > 127:

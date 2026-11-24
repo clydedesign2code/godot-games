@@ -5,16 +5,17 @@ config_version=5
 config/name="指板相對音程 · Fret Relations"
 run/main_scene="res://src/trainer/trainer.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/description="以根音為中心，查閱與練習吉他指板上的音程、雙音與三和弦。"
+config/description="在吉他指板上查和弦、音程與轉位，試聽不同弦組的按法，也能從目前的位置開始練習。"
 
 [display]
 window/size/viewport_width=1360
 window/size/viewport_height=900
 window/size/window_width_override=1360
 window/size/window_height_override=900
-window/size/min_width=1000
-window/size/min_height=760
+window/size/min_width=360
+window/size/min_height=480
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [rendering]
 renderer/rendering_method="gl_compatibility"
