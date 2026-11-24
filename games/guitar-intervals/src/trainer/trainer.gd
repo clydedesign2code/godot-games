@@ -238,22 +238,14 @@ func _build_ui() -> void:
 	content.add_theme_constant_override("separation", 10)
 	faceplate.add_child(content)
 	header = BoxContainer.new()
-	header.add_theme_constant_override("separation", 8)
+	header.add_theme_constant_override("separation", 10)
 	content.add_child(header)
-	var brand := VBoxContainer.new()
-	brand.add_theme_constant_override("separation", 0)
-	header.add_child(brand)
-	brand.add_child(_mono("FR–12", 32, P.INK))
-	brand.add_child(_label("FRET RELATIONS  /  吉他指板查閱", 12, P.MUTED))
-	brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var header_info := VBoxContainer.new()
-	header_info.add_theme_constant_override("separation", 3)
-	header.add_child(header_info)
-	tuning = _mono("標準調弦    E · A · D · G · B · e", 11)
-	tuning.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	header_info.add_child(tuning)
-	var sound_controls := _row(header_info, 8)
+	var tabs := _row(header, 8)
+	tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sound_controls := _row(header, 8)
 	sound_controls.alignment = BoxContainer.ALIGNMENT_END
+	tuning = _mono("標準調弦  E A D G B e", 11)
+	sound_controls.add_child(tuning)
 	mute_button = _button("● 聲音開", func() -> void:
 		tone_player.set_muted(not tone_player.muted)
 		mute_button.text = "○ 靜音" if tone_player.muted else "● 聲音開"
@@ -266,7 +258,8 @@ func _build_ui() -> void:
 	volume_slider.min_value = 0
 	volume_slider.max_value = 100
 	volume_slider.value = tone_player.volume_percent
-	volume_slider.custom_minimum_size.x = 100
+	volume_slider.custom_minimum_size = Vector2(100, 44)
+	volume_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	volume_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	volume_slider.tooltip_text = "試聽音量"
 	sound_controls.add_child(volume_slider)
@@ -277,7 +270,6 @@ func _build_ui() -> void:
 		tone_player.set_volume(value)
 		volume_value.text = "%02d" % int(value)
 	)
-	var tabs := _row(content, 8)
 	practice_tabs = HFlowContainer.new()
 	practice_tabs.add_theme_constant_override("h_separation", 8)
 	content.add_child(practice_tabs)
@@ -455,7 +447,7 @@ func _build_ui() -> void:
 func _update_instrument_layout() -> void:
 	if is_instance_valid(instrument_body):
 		instrument_body.vertical = size.x < 1180.0
-		header.vertical = size.x < 560
+		header.vertical = size.x < 720
 		tuning.visible = size.x >= 560
 		var margin := 6 if size.x < 650 else 16
 		for edge in ["left", "right", "top", "bottom"]:

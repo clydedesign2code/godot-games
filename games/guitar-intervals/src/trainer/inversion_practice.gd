@@ -8,6 +8,7 @@ const StringGroupKey = preload("res://src/ui/string_group_key.gd")
 const P = preload("res://src/ui/instrument_theme.gd")
 
 const INVERSION_NAMES := ["原位", "第一轉位", "第二轉位", "第三轉位"]
+const SHORT_INVERSIONS := ["原位", "一轉", "二轉", "三轉"]
 const COMMON_QUALITIES := [0, 1, 6, 4, 5]
 const MORE_QUALITIES := [10, 11, 8, 9, 2, 3, 7, 12, 13]
 const NO_POSITION := Vector2i(-1, -1)
@@ -52,7 +53,7 @@ var inversion_buttons: Array[Button] = []
 var display_buttons: Array[Button] = []
 var settings: VBoxContainer
 var selector_grid: GridContainer
-var region_grid: GridContainer
+var region_controls: BoxContainer
 var display_header: BoxContainer
 var details_row: BoxContainer
 var screen_actions: HFlowContainer
@@ -61,6 +62,7 @@ var practice_button: Button
 var back_button: Button
 var question: Label
 var composition: Label
+var formula_label: Label
 var bass_label: Label
 var instruction: Label
 var readout: Label
@@ -128,9 +130,25 @@ func _flow(parent: Container) -> HFlowContainer:
 func _section(parent: Container, caption: String) -> HFlowContainer:
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 5)
 	parent.add_child(column)
 	column.add_child(_label(caption, 13, P.MUTED))
 	return _flow(column)
+
+
+func _setting_keys(caption: String, stretch: float) -> HBoxContainer:
+	var section := BoxContainer.new()
+	section.vertical = true
+	section.alignment = BoxContainer.ALIGNMENT_BEGIN
+	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	section.size_flags_stretch_ratio = stretch
+	section.add_theme_constant_override("separation", 5)
+	region_controls.add_child(section)
+	section.add_child(_label(caption, 13, P.MUTED))
+	var keys := HBoxContainer.new()
+	keys.add_theme_constant_override("separation", 5)
+	section.add_child(keys)
+	return keys
 
 
 func _choice(parent: Container, caption: String, group: ButtonGroup, action: Callable) -> Button:
@@ -156,7 +174,7 @@ func _keys(parent: Container, captions: Array, action: Callable) -> Array[Button
 
 func _build_controls() -> void:
 	settings = VBoxContainer.new()
-	settings.add_theme_constant_override("separation", 6)
+	settings.add_theme_constant_override("separation", 10)
 	add_child(settings)
 	selector_grid = GridContainer.new()
 	selector_grid.columns = 2
@@ -180,15 +198,15 @@ func _build_controls() -> void:
 	more_quality_button.toggle_mode = true
 	more_quality_button.tooltip_text = "掛留、六和弦與其他變化和弦"
 
-	region_grid = GridContainer.new()
-	region_grid.add_theme_constant_override("h_separation", 12)
-	settings.add_child(region_grid)
-	var span := _flow(region_grid)
-	span.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	count_buttons = _keys(_control_group(span, "弦數"), ["3 條弦", "4 條弦", "5 條弦"], _set_count)
-	var group_label := _label("弦組", 13, P.MUTED)
-	group_label.tooltip_text = "小圖由上到下是第 1 到第 6 弦。1 弦最細，6 弦最粗。"
-	span.add_child(group_label)
+	region_controls = BoxContainer.new()
+	settings.add_child(region_controls)
+	count_buttons = _keys(_setting_keys("弦數", 0.18), ["3", "4", "5"], _set_count)
+	for i in count_buttons.size():
+		var button := count_buttons[i]
+		button.custom_minimum_size = Vector2(44, 52)
+		button.accessibility_name = "%d 條弦" % (i + 3)
+		button.tooltip_text = button.accessibility_name
+	var group_keys := _setting_keys("弦組", 0.32)
 	var area_group := ButtonGroup.new()
 	for first in range(1, 5):
 		var key := StringGroupKey.new()
@@ -197,12 +215,11 @@ func _build_controls() -> void:
 		key.add_theme_stylebox_override("hover_pressed", P.key(P.SCREEN, true))
 		key.configure(first, 3)
 		key.pressed.connect(_set_region.bind(first))
-		span.add_child(key)
+		group_keys.add_child(key)
 		string_group_buttons.append(key)
-	var inversion_row := _flow(region_grid)
-	inversion_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inversion_row.add_child(_label("轉位", 13, P.MUTED))
-	inversion_buttons = _keys(inversion_row, INVERSION_NAMES, _set_inversion)
+	inversion_buttons = _keys(_setting_keys("轉位", 0.5), INVERSION_NAMES, _set_inversion)
+	for button in inversion_buttons:
+		button.custom_minimum_size = Vector2(56, 52)
 	var display := PanelContainer.new()
 	display.add_theme_stylebox_override("panel", P.panel(P.SCREEN, Color("080e0b"), 6, 12))
 	add_child(display)
@@ -227,9 +244,11 @@ func _build_controls() -> void:
 	screen.add_child(details_row)
 	var chord_info := _flow(details_row)
 	chord_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	chord_info.add_theme_constant_override("separation", 20)
+	chord_info.add_theme_constant_override("h_separation", 14)
 	composition = _label("", 15, P.TARGET)
 	chord_info.add_child(composition)
+	formula_label = _label("", 15, P.TARGET)
+	chord_info.add_child(formula_label)
 	bass_label = _label("", 15, P.ROOT)
 	chord_info.add_child(bass_label)
 	shape_info = _label("", 14, P.SCREEN_MUTED)
@@ -294,7 +313,17 @@ func _build_controls() -> void:
 
 func _adapt_layout() -> void:
 	selector_grid.columns = 1 if size.x < 670 else 2
-	region_grid.columns = 1 if size.x < 1020 else 2
+	var stacked := size.x < 670
+	region_controls.vertical = stacked
+	region_controls.add_theme_constant_override("separation", 5 if stacked else (10 if size.x < 860 else 14))
+	for section: BoxContainer in region_controls.get_children():
+		section.vertical = not stacked
+		section.add_theme_constant_override("separation", 8 if stacked else 5)
+		var label: Label = section.get_child(0)
+		label.custom_minimum_size.x = 30 if stacked else 0
+	for i in inversion_buttons.size():
+		inversion_buttons[i].text = SHORT_INVERSIONS[i] if size.x < 800 else INVERSION_NAMES[i]
+		inversion_buttons[i].custom_minimum_size.x = 48 if size.x < 800 else 56
 	display_header.vertical = size.x < 630
 	details_row.vertical = size.x < 670
 	screen_actions.custom_minimum_size.x = 0 if details_row.vertical else 290
@@ -434,12 +463,15 @@ func _start_question(preferred_shape: int = 0) -> void:
 			continue
 		button.disabled = i not in available
 		var slash: String = names[0] + chord.suffix + ("/" + names[i] if i else "")
-		button.text = "%s  %s" % [INVERSION_NAMES[i], slash]
-		button.tooltip_text = "此弦組與配置無可用按法" if button.disabled else ""
+		button.accessibility_name = "%s，%s，最低音 %s" % [INVERSION_NAMES[i], slash, names[i]]
+		button.tooltip_text = "%s　最低音 %s" % [slash, names[i]]
+		if button.disabled:
+			button.tooltip_text += "　此弦組與配置無可用按法"
 		button.set_pressed_no_signal(i == inversion)
 		if i == inversion:
-			question.text = ("%s    %s  ·  %s" % [slash, INVERSION_NAMES[i], string_group_label])
-	composition.text = "組成音  %s     ｜     音級  %s" % [" · ".join(names), chord.formula]
+			question.text = "%s　%s · %d–%d 弦" % [slash, INVERSION_NAMES[i], first_string, first_string + string_count - 1]
+	composition.text = "組成音  %s" % " · ".join(names)
+	formula_label.text = "音級  %s" % chord.formula
 	bass_label.text = "● 最低音  %s（%s）" % [names[inversion], Inversions.degree_name(chord_index, inversion)]
 	instruction.text = "在 %s各選一個位置，以 %s 為最低音。" % [string_group_label, names[inversion]]
 	_set_feedback("從任一條亮起的弦開始。再點一次可取消，同弦另一品可換音。", P.INFO)

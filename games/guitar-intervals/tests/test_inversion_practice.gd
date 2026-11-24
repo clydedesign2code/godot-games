@@ -115,7 +115,7 @@ func _run() -> void:
 	await click(page.count_buttons[0])
 	await click(page.string_group_buttons[1])
 	await click(page.inversion_buttons[1])
-	check(page.inversion_buttons[1].text.contains("C/E") and page.question.text.contains("C/E"), "Slash chord directly on inversion button and heading")
+	check(page.inversion_buttons[1].text == "第一轉位" and page.inversion_buttons[1].tooltip_text.contains("C/E") and page.question.text.contains("C/E"), "Short inversion key and full slash chord in tooltip and heading")
 	check(page.selection == [Vector2i(3,2),Vector2i(2,0),Vector2i(1,1)], "C/E on 432 uses E3 G3 C4 through the G-B tuning step")
 	await click(page.display_buttons[2])
 	check(page.board.note_labels[Vector2i(3,2)] == "E" and page.board.secondary_labels[Vector2i(3,2)] == "3", "Displayed bass uses the root-relative third without octave digit")
@@ -132,7 +132,7 @@ func _run() -> void:
 	await click(page.string_group_buttons[0])
 	await click(page.quality_buttons[5])
 	await click(page.inversion_buttons[3])
-	check(page.question.text.contains("C7/B♭") and page.inversion_buttons[3].text.contains("C7/B♭"), "C7 third inversion and slash spelling")
+	check(page.question.text.contains("C7/B♭") and page.inversion_buttons[3].tooltip_text.contains("C7/B♭"), "C7 third inversion and slash spelling")
 	await click(page.display_buttons[2])
 	check(page.shapes.size() > 1, "Several C7/B-flat grips are available")
 	await click(page.next_shape_button)
@@ -215,8 +215,51 @@ func _run() -> void:
 	check(not page.is_practicing and page.root_pc == 0, "Top-level Chords also returns to lookup")
 	await check_sus_and_sixth_lookup()
 	await check_five_strings()
+	await check_selector_layout()
 	print("Chord explorer: %d checks, %d failures" % [checks, failures])
 	quit(int(failures > 0))
+
+
+func check_selector_layout() -> void:
+	if page.extra_qualities.visible:
+		await click(page.more_quality_button)
+	await click(page.quality_buttons[6])
+	await click(page.count_buttons[2])
+	await click(page.string_group_buttons[1])
+	await click(page.inversion_buttons[1])
+	for viewport_size in [Vector2i(1360, 900), Vector2i(768, 1024), Vector2i(390, 844)]:
+		root.size = viewport_size
+		app.page_scroll.scroll_vertical = 0
+		await frames()
+		var navigation_y: float = app.mode_buttons[4].global_position.y
+		check(is_equal_approx(navigation_y, app.header.global_position.y), "Navigation starts at the top of the panel")
+		check(is_equal_approx(navigation_y, app.mute_button.global_position.y) == (viewport_size.x >= 768), "Sound controls share the top row on desktop and tablet")
+		check(app.volume_slider.size.y >= 44, "Volume slider has a full-height touch target")
+		var sections: Array = page.region_controls.get_children()
+		var last_rect := Rect2()
+		var first_x: float = sections.front().get_child(1).global_position.x
+		for section: Control in sections:
+			var heading: Label = section.get_child(0)
+			var keys: Container = section.get_child(1)
+			var first_key: Rect2 = keys.get_child(0).get_global_rect()
+			if viewport_size.x >= 768:
+				check(is_equal_approx(heading.global_position.x, first_key.position.x) and heading.get_global_rect().end.y < first_key.position.y, "Each setting is labeled above its first key")
+			else:
+				check(heading.get_global_rect().end.x < first_key.position.x and is_equal_approx(first_x, first_key.position.x), "Phone labels form a left column with aligned controls")
+			if last_rect.has_area():
+				check(not last_rect.intersects(section.get_global_rect()), "Setting groups have their own space")
+			last_rect = section.get_global_rect()
+			for key: Button in keys.get_children():
+				if key.is_visible_in_tree():
+					check(key.get_global_rect().end.x <= viewport_size.x and key.size.x >= 44 and key.size.y >= 44, "All keys are visible touch targets")
+		if viewport_size.x >= 768:
+			check(is_equal_approx(sections.front().global_position.y, sections.back().global_position.y), "iPad and desktop align all three group headings at %s; target %s, group minima %s" % [viewport_size, page.region_controls.size, sections.map(func(s: Control): return s.get_combined_minimum_size())])
+		else:
+			check(sections.back().global_position.y > sections.front().global_position.y, "Phone wraps complete groups")
+		check(page.question.text.contains("Cm7/E♭") and page.formula_label.text.contains("♭7"), "Full slash chord and formula remain on screen")
+		for element: Control in [app, page, page.composition, page.formula_label, page.board, page.question, page.region_controls]:
+			check(element.get_global_rect().end.x <= viewport_size.x + 1, "Full chord fits the actual window, including its composition")
+		await save_preview("chord-controls-%d" % viewport_size.x)
 
 
 func check_sus_and_sixth_lookup() -> void:
