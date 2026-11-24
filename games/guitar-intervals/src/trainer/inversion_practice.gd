@@ -176,7 +176,7 @@ func _build_controls() -> void:
 		var key := _choice(qualities if id in COMMON_QUALITIES else extra_qualities, caption, quality_group, _set_quality.bind(id))
 		key.tooltip_text = definition.name + "　" + definition.formula
 		quality_buttons[id] = key
-	more_quality_button = _button(qualities, "更多和弦 ▸", _toggle_more_qualities)
+	more_quality_button = _button(qualities, "更多和弦 ＋", _toggle_more_qualities)
 	more_quality_button.toggle_mode = true
 	more_quality_button.tooltip_text = "掛留、六和弦與其他變化和弦"
 
@@ -334,11 +334,11 @@ func _toggle_more_qualities() -> void:
 
 func _update_more_caption() -> void:
 	if extra_qualities.visible:
-		more_quality_button.text = "收合和弦 ▴"
+		more_quality_button.text = "收合和弦 −"
 	elif chord_index in MORE_QUALITIES:
-		more_quality_button.text = "更多和弦 · %s ▸" % quality_buttons[chord_index].text
+		more_quality_button.text = "更多和弦 · %s ＋" % quality_buttons[chord_index].text
 	else:
-		more_quality_button.text = "更多和弦 ▸"
+		more_quality_button.text = "更多和弦 ＋"
 
 
 func _set_count(index: int) -> void:
