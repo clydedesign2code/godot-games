@@ -185,7 +185,7 @@ func _build_controls() -> void:
 	settings.add_child(region_grid)
 	var span := _flow(region_grid)
 	span.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	count_buttons = _keys(_control_group(span, "弦數"), ["3 條弦", "4 條弦"], _set_count)
+	count_buttons = _keys(_control_group(span, "弦數"), ["3 條弦", "4 條弦", "5 條弦"], _set_count)
 	var group_label := _label("弦組", 13, P.MUTED)
 	group_label.tooltip_text = "小圖由上到下是第 1 到第 6 弦。1 弦最細，6 弦最粗。"
 	span.add_child(group_label)
@@ -211,6 +211,7 @@ func _build_controls() -> void:
 	display_header = BoxContainer.new()
 	screen.add_child(display_header)
 	question = _label("", 24, P.SCREEN_INK)
+	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	question.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	display_header.add_child(question)
 	var display_choice := _control_group(display_header, "指板標示", P.SCREEN_MUTED)
@@ -440,14 +441,6 @@ func _start_question(preferred_shape: int = 0) -> void:
 			question.text = ("%s    %s  ·  %s" % [slash, INVERSION_NAMES[i], string_group_label])
 	composition.text = "組成音  %s     ｜     音級  %s" % [" · ".join(names), chord.formula]
 	bass_label.text = "● 最低音  %s（%s）" % [names[inversion], Inversions.degree_name(chord_index, inversion)]
-	shape_info.text = ""
-	if string_count == 3 and tones.size() == 4:
-		shape_info.text = "三弦配置省略五度 %s，保留根音、三度與%s。" % [names[2], Inversions.degree_name(chord_index, 3)]
-	elif not Inversions.supports_count(chord_index, 3):
-		shape_info.text = "此和弦的變化五度 %s 決定和弦性質，使用四條弦保留完整四音。" % names[2]
-	elif string_count == 4 and tones.size() == 3:
-		shape_info.text = "四弦配置保留三個和弦音，其中一音重複。"
-	shape_info.visible = not shape_info.text.is_empty()
 	instruction.text = "在 %s各選一個位置，以 %s 為最低音。" % [string_group_label, names[inversion]]
 	_set_feedback("從任一條亮起的弦開始。再點一次可取消，同弦另一品可換音。", P.INFO)
 	if revealed and not shapes.is_empty():
@@ -637,6 +630,30 @@ func _show_shape() -> void:
 	_refresh()
 
 
+func _describe_voicing(showing_shape: bool) -> String:
+	if string_count == 3 and tones.size() == 4:
+		return "三弦配置省略五度 %s，保留根音、三度與%s。" % [names[2], Inversions.degree_name(chord_index, 3)]
+	var details := PackedStringArray()
+	var extra := string_count - tones.size()
+	if extra > 0:
+		details.append("%d 條弦 · %d 個和弦音" % [string_count, tones.size()])
+		if showing_shape:
+			var counts := PackedInt32Array()
+			counts.resize(tones.size())
+			for position in selection:
+				counts[_tone_index(position)] += 1
+			var repeated := PackedStringArray()
+			for i in counts.size():
+				if counts[i] > 1:
+					repeated.append("%s（%s）佔 %d 條弦" % [names[i], Inversions.degree_name(chord_index, i), counts[i]])
+			details.append("、".join(repeated))
+		else:
+			details.append("另有 %d 個弦位重複和弦音" % extra)
+	if not Inversions.supports_count(chord_index, 3):
+		details.append("保留變化五度 %s" % names[2])
+	return "　｜　".join(details)
+
+
 func _refresh() -> void:
 	board.named_positions.assign(selection)
 	board.note_labels.clear()
@@ -663,14 +680,8 @@ func _refresh() -> void:
 	if showing_shape:
 		fingers = Fingering.fingers(shapes[shape_index])
 		instruction.text = "左手參考指法　1 食指　2 中指　3 無名指　4 小指。同指同品可用小橫按。"
-		if string_count == 4 and tones.size() == 3:
-			var seen: Array[int] = []
-			for position in selection:
-				var degree := _tone_index(position)
-				if degree in seen:
-					shape_info.text = "四弦配置保留三個和弦音，這個指法重複 %s（%s）。" % [names[degree], Inversions.degree_name(chord_index, degree)]
-					break
-				seen.append(degree)
+	shape_info.text = _describe_voicing(showing_shape)
+	shape_info.visible = not shape_info.text.is_empty()
 	var entries := PackedStringArray()
 	for row: int in board.active_rows:
 		var slot := "%d 弦  —" % (row + 1)

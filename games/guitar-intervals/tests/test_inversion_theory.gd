@@ -21,13 +21,18 @@ func _initialize() -> void:
 	_verify_group(false)
 	_verify_group(true)
 	_verify_interval_labels()
-	_verify_all_spans(FORMULAS, [1822, 4751])
-	_verify_all_spans(SIXTH_SUS_FORMULAS, [992, 2024])
+	_verify_all_spans(FORMULAS, [1822, 4751, 10668])
+	_verify_all_spans(SIXTH_SUS_FORMULAS, [992, 2024, 4470])
 	_verify_degree_names()
 	_verify_examples(0, [[8, 7, 5], [12, 10, 10], [3, 3, 2]])
 	_verify_examples(5, [[8, 10, 8, 9], [12, 13, 10, 12], [3, 3, 2, 3], [6, 7, 5, 5]])
 	_verify_examples(0, [[5, 5, 3], [9, 8, 8], [0, 1, 0]], true)
 	_verify_examples(5, [[10, 12, 11, 12], [2, 3, 1, 3], [5, 5, 5, 6], [8, 9, 8, 8]], true)
+	var high_cm7 := Model.span_voicings(6, 0, 0, 5, 1)
+	var low_cm7 := Model.span_voicings(6, 0, 0, 5, 2)
+	_check(high_cm7[0] == [Vector2i(4, 3), Vector2i(3, 5), Vector2i(2, 3), Vector2i(1, 4), Vector2i(0, 3)], "Cm7 on strings 5–1 starts with the movable A-string form")
+	_check(low_cm7[0] == [Vector2i(5, 8), Vector2i(4, 10), Vector2i(3, 8), Vector2i(2, 8), Vector2i(1, 8)], "Cm7 on strings 6–2 starts with the movable E-string form")
+	_check([Vector2i(4, 15), Vector2i(3, 13), Vector2i(2, 12), Vector2i(1, 11), Vector2i(0, 15)] not in high_cm7, "a complete Cm7 that requires five fingers is not offered")
 	_check(Model.note_names(13, 0) == ["C", "E♭", "G♭", "B♭♭"], "diminished seventh spelling")
 	_check(Model.note_names(12, 1) == ["C♯", "E", "G", "B"], "half-diminished spelling")
 	var crossed: Array[Vector2i] = [Vector2i(5, 8), Vector2i(4, 0), Vector2i(3, 4), Vector2i(2, 8)]
@@ -56,7 +61,7 @@ func _verify_degree_names() -> void:
 
 
 func _verify_all_spans(formulas: Dictionary, expected_counts: Array) -> void:
-	for count in [3, 4]:
+	for count in [3, 4, 5]:
 		var total := 0
 		for first_string in range(1, 8 - count):
 			var rows := range(first_string + count - 2, first_string - 2, -1)

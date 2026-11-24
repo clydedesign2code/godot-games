@@ -15,7 +15,8 @@ func configure(first: int, count: int) -> void:
 	accessibility_name = "第 %s 弦" % "、".join(numbers)
 	tooltip_text = accessibility_name
 	caption = "·".join(numbers)
-	custom_minimum_size = Vector2(76, 65)
+	var caption_width := get_theme_font("font").get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+	custom_minimum_size = Vector2(maxf(76, ceilf(caption_width) + 12), 65)
 	queue_redraw()
 
 

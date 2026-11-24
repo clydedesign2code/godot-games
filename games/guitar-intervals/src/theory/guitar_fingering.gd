@@ -1,10 +1,10 @@
 extends RefCounted
-## Suggested left-hand fingers for a grip on three or four consecutive strings.
+## Suggested left-hand fingers for a grip on three to five consecutive strings.
 ## Positions and fingers are ordered from the thickest to the thinnest string.
 
 static func fingers(shape: Array) -> Array[int]:
 	var result: Array[int] = []
-	if shape.size() < 3 or shape.size() > 4:
+	if shape.size() < 3 or shape.size() > 5:
 		return result
 	var frets: Array[int] = []
 	for i in range(shape.size()):
@@ -13,8 +13,6 @@ static func fingers(shape: Array) -> Array[int]:
 			return result
 		if position.y > 0 and position.y not in frets:
 			frets.append(position.y)
-	result.resize(shape.size())
-	result.fill(0)
 	frets.sort()
 
 	# At one fret a barre can pass underneath a higher fretted note.
@@ -31,6 +29,10 @@ static func fingers(shape: Array) -> Array[int]:
 		if not group.is_empty():
 			groups.append(group)
 
+	if groups.size() > 4:
+		return result
+	result.resize(shape.size())
+	result.fill(0)
 	var previous_finger := 0
 	for i in range(groups.size()):
 		var group: Array = groups[i]

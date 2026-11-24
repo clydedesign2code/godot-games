@@ -31,7 +31,21 @@ func _initialize() -> void:
 	_check(_for_frets([5, 4, 5]) == [2, 1, 3], "lower middle fret requires split fingers")
 	_check(_for_frets([0, 1, 5, 5]) == [0, 1, 4, 4], "open bass and stretched little-finger barre")
 	_check(_for_frets([0, 0, 0]) == [0, 0, 0], "all open strings")
-	print("Guitar fingering: %d questions, %d grips, %d checks, %d failures" % [questions, grips, checks, failures])
+	_check(_for_frets([8, 10, 8, 8, 8]) == [1, 3, 1, 1, 1], "common movable Cm7 on the lower five strings")
+	_check(_for_frets([3, 5, 3, 4, 3]) == [1, 3, 1, 2, 1], "common movable Cm7 on the upper five strings")
+	_check(_for_frets([15, 13, 12, 11, 15]).is_empty(), "low frets prevent a five-finger Cm7 from sharing a barre")
+	_check(_for_frets([5, 4, 5, 3, 5]).is_empty(), "separated positions at the same fret may require three independent fingers")
+	_check(_for_frets([5, 0, 5, 0, 5]) == [1, 0, 2, 0, 3], "three split fingers and two open strings")
+	var five_count := 0
+	for chord_id: int in Inversions.TRIAD_IDS + Inversions.SUS_IDS + Inversions.SEVENTH_IDS + Inversions.SIXTH_IDS:
+		for root_pc in range(12):
+			for first_string in [1, 2]:
+				for inversion in Inversions.available_inversions(chord_id, 5):
+					for shape in Inversions.span_voicings(chord_id, root_pc, inversion, 5, first_string):
+						_verify_fingers(shape, Fingering.fingers(shape))
+						five_count += 1
+	_check(five_count == 15138, "all five-string finger assignments verified")
+	print("Guitar fingering: %d legacy questions (%d grips), %d five-string grips, %d checks, %d failures" % [questions, grips, five_count, checks, failures])
 	quit(1 if failures else 0)
 
 

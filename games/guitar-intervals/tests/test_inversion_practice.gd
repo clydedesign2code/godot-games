@@ -95,7 +95,8 @@ func _run() -> void:
 	check(page.string_count == 3 and page.inversion_buttons[2].disabled and page.shape_info.text.contains("省略五度 G"), "m7 shell excludes its fifth and second inversion")
 	await click(page.quality_buttons[0])
 	check(page.string_count == 3 and page.fixed_count, "Explicit span held across quality changes")
-	for count_index in range(2):
+	check(page.count_buttons.size() == 3, "Choose three, four or five strings")
+	for count_index in page.count_buttons.size():
 		await click(page.count_buttons[count_index])
 		var count: int = 3 + count_index
 		for first in range(1, 8-count):
@@ -108,7 +109,8 @@ func _run() -> void:
 			for pos: Vector2i in page.selection:
 				midi.append(Theory.midi(pos))
 			check(app.tone_player.current_notes == midi, "Heard registers agree with the grip")
-		check(page.string_group_buttons[3].visible == (count == 3), "Only valid region keys are visible")
+		for i in page.string_group_buttons.size():
+			check(page.string_group_buttons[i].visible == (i + count <= 6), "Only complete consecutive string groups are visible")
 
 	await click(page.count_buttons[0])
 	await click(page.string_group_buttons[1])
@@ -212,6 +214,7 @@ func _run() -> void:
 	await click(app.mode_buttons[4])
 	check(not page.is_practicing and page.root_pc == 0, "Top-level Chords also returns to lookup")
 	await check_sus_and_sixth_lookup()
+	await check_five_strings()
 	print("Chord explorer: %d checks, %d failures" % [checks, failures])
 	quit(int(failures > 0))
 
@@ -253,3 +256,80 @@ func check_sus_and_sixth_lookup() -> void:
 	check(not page.quality_buttons[9].is_visible_in_tree() and page.more_quality_button.text.contains("m6"), "Collapsed control retains the chosen additional quality")
 	await click(page.count_buttons[1])
 	check(page.chord_index == 9 and page.selection.size() == 4 and page.inversion_buttons[2].visible and not page.inversion_buttons[2].disabled, "Four-string Cm6 restores all four tones and its fifth inversion choice")
+
+
+func check_five_strings() -> void:
+	await click(page.quality_buttons[0])
+	await click(page.root_buttons[0])
+	await click(page.inversion_buttons[1])
+	await click(page.count_buttons[2])
+	await click(page.string_group_buttons[1])
+	check(page.question.text.contains("C/E") and page.board.active_rows == [5,4,3,2,1], "Changing count and region keeps the playable slash chord")
+	for viewport_size in [Vector2i(768,1024), Vector2i(390,844)]:
+		root.size = viewport_size
+		await frames()
+		for control: Control in [page.count_buttons[2], page.string_group_buttons[0], page.string_group_buttons[1], page.question, page.readout, page.practice_button]:
+			check(control.get_global_rect().end.x <= app.size.x + 1, "Five-string layout fits %s at %d" % [control.name, viewport_size.x])
+		for key in page.string_group_buttons.slice(0, 2):
+			var caption_width: float = key.get_theme_font("font").get_string_size(key.caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			check(key.size.x >= caption_width + 10, "All five string numbers fit with padding")
+		await click(page.string_group_buttons[0])
+		check(page.board.active_rows == [4,3,2,1,0] and page.selection.size() == 5, "Touch-sized 12345 key is reachable at %d" % viewport_size.x)
+		await click(page.string_group_buttons[1])
+		check(page.board.active_rows == [5,4,3,2,1], "Touch-sized 23456 key is reachable at %d" % viewport_size.x)
+	await click(page.quality_buttons[6])
+	await click(page.inversion_buttons[0])
+	for first in [1, 2]:
+		await click(page.string_group_buttons[first - 1])
+		await click(page.listen_button)
+		check(page.composition.text.contains("C · E♭ · G · B♭") and page.shape_info.text.contains("G（五度）佔 2 條弦"), "Five-string Cm7 names its four notes and doubled fifth")
+		check(app.tone_player.current_notes == [48,55,58,63,67], "Both common Cm7 fingerings sound C3 G3 B-flat3 E-flat4 G4")
+		if first == 1:
+			root.size = Vector2i(768,1024)
+			await frames()
+			await save_preview("five-string-Cm7-ipad")
+	await click(page.quality_buttons[5])
+	await click(page.inversion_buttons[3])
+	check(page.string_count == 5 and page.question.text.contains("C7/B♭") and page.shape_info.text.contains("4 個和弦音"), "Five-string seventh retains all four degrees under a slash bass")
+	var counts := {}
+	for position: Vector2i in page.selection:
+		var pc := Theory.midi(position) % 12
+		counts[pc] = counts.get(pc, 0) + 1
+	for pc: int in counts:
+		if counts[pc] == 2:
+			var doubled_name: String = page.names[page.tones.find(pc)]
+			check(page.shape_info.text.contains(doubled_name + "（") and page.shape_info.text.count("佔 2 條弦") == 1, "Five-string seventh identifies the single doubled note")
+	await click(page.more_quality_button)
+	await click(page.quality_buttons[12])
+	check(page.string_count == 5 and page.shape_info.text.contains("變化五度 G♭") and page.shape_info.text.contains("佔 2 條弦"), "Five-string half-diminished voicing retains its altered fifth and identifies its doubling")
+	await click(page.quality_buttons[0])
+	await click(page.string_group_buttons[0])
+	await click(page.inversion_buttons[0])
+	root.size = Vector2i(1024,768)
+	await frames()
+	await save_preview("five-string-C")
+	var original_shape: Array = page.selection.duplicate()
+	var base_score: int = page.correct_count
+	for frets in [[3,2,0,1,0], [3,2,0,5,0]]:
+		await click(page.practice_button)
+		check(page.shape_info.text.contains("另有 2 個弦位") and not page.shape_info.text.contains("佔 2 條弦") and page.board.markers.is_empty(), "New exercise explains doubling without revealing the grip")
+		await pick(6, 0)
+		check(page.selection.is_empty(), "Sixth string stays outside 12345")
+		var played: Array[int] = []
+		for i in 5:
+			var row := 4 - i
+			played.append(Theory.midi(Vector2i(row, frets[i])))
+			await pick(row + 1, frets[i])
+			check(page.selection.size() == i + 1 and page.complete == (i == 4), "Recall requires one note on each of the five strings")
+		base_score += 1
+		check(page.correct_count == base_score, "Five-note completion scores once")
+		if frets[3] == 1:
+			check(page.shape_info.text.contains("C（根音）佔 2 條弦") and page.shape_info.text.contains("E（三度）佔 2 條弦"), "Both doubled degrees are named")
+		else:
+			check(page.shape_info.text.contains("E（三度）佔 3 條弦") and page.shape_info.text.count("佔 ") == 1, "Three occurrences of the same degree are counted together")
+		await click(page.listen_button)
+		check(app.tone_player.current_notes == played and page.board.sounding.size() == 5, "Full grip sounds on five strings, including any unisons")
+		await click(page.next_button)
+		check(page.root_pc != 0 and page.string_count == 5 and page.first_string == 1 and page.inversion == 0, "Next recall changes only the root")
+		await click(page.back_button)
+		check(page.root_pc == 0 and page.string_count == 5 and page.selection == original_shape and page.advance.is_stopped(), "Returning restores the five-string lookup grip")

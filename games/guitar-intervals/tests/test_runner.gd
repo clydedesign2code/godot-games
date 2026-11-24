@@ -148,6 +148,11 @@ func _audio_model_tests() -> void:
 	# Low four strings: C7/E, frets 0, 1, 5, 5. Frequencies must retain the E2 bass.
 	cases.append([40, 46, 55, 60])
 	cases.append([48, 48, 48, 48])
+	# Standard tuning, strings 5–1. Both C grips retain their repeated degrees.
+	cases.append([48, 52, 55, 60, 64]) # x32010
+	var doubled_g: Array[int] = [48, 55, 55, 60, 64] # x35010, two strings sound G3.
+	cases.append(doubled_g)
+	cases.append([48, 48, 48, 48, 48])
 	for notes in cases:
 		var typed_notes: Array[int] = []
 		typed_notes.assign(notes)
@@ -170,9 +175,23 @@ func _audio_model_tests() -> void:
 			DirAccess.make_dir_recursive_absolute(capture_dir)
 			var filename: String = {1: "single-a4", 2: "dyad-c-e", 3: "triad-c-e-g"}[notes.size()]
 			_check(stream.save_to_wav(capture_dir.path_join(filename + ".wav")) == OK, "Export audio preview " + filename)
-	_check(synth.stream_for([]) == null and synth.stream_for([-1]) == null and synth.stream_for([48, 52, 55, 58, 62]) == null, "Reject empty, invalid MIDI or more than four voices")
+	# Check relative levels too: a spectrum alone cannot detect a discarded unison.
+	var components: Array[PackedByteArray] = []
+	for note in doubled_g:
+		components.append(synth.stream_for([note]).data)
+	var mixed: PackedByteArray = synth.stream_for(doubled_g).data
+	var max_error := 0
+	for frame in range(0, mixed.size() / 2, 199):
+		var total := 0
+		for component in components:
+			total += component.decode_s16(frame * 2)
+		var expected := roundi(float(total) / components.size())
+		max_error = maxi(max_error, absi(mixed.decode_s16(frame * 2) - expected))
+	_check(max_error <= 1, "Every played string contributes one voice, including both G3s")
+	_check(synth.stream_for([48, 48, 48, 48, 48]).data == synth.stream_for([48]).data, "Five unisons retain single-note headroom")
+	_check(synth.stream_for([]) == null and synth.stream_for([-1]) == null and synth.stream_for([48, 52, 55, 58, 62, 64]) == null, "Reject empty, invalid MIDI or more than five voices")
 	synth.queue_free()
-	print("PASS: PCM pitch spectra, simultaneous triads and four-note inversions, octave register, envelopes and clipping")
+	print("PASS: PCM pitch spectra, simultaneous chords through five voices, unison balance, octave register, envelopes and clipping")
 
 
 func _ui_tests() -> void:
@@ -365,10 +384,18 @@ func _audio_ui_tests() -> void:
 	_check(app.note_readout.text == "音名：C♯（5 弦 · 4 品）" and app.picked.is_empty(), "Wrong practice answer shows the clicked accidental without selecting it")
 	app.tone_player.stop()
 	await create_timer(0.1).timeout
+	audio_capture.clear_buffer()
+	var five_strings: Array[int] = [48, 55, 55, 60, 64]
+	var six_strings: Array[int] = [40, 45, 50, 55, 59, 64]
+	_check(app.tone_player.play_notes(five_strings), "Start the five-string C grip")
+	_check(app.tone_player.current_notes == five_strings, "Five sounding strings retain both occurrences of G3")
+	_check(not app.tone_player.play_notes(six_strings) and app.tone_player.current_notes == five_strings, "Six-voice request leaves the five-string chord playing")
+	await _check_audio_output("five-string C with two simultaneous G3s")
+	app.tone_player.stop()
 	_check(AudioServer.get_bus_volume_db(0) == master_volume, "App volume does not change the master bus")
 	app.tone_player.player.bus = "Master"
 	AudioServer.remove_bus(bus_index)
-	print("PASS: actual audio bus output, clicked MIDI pitches, dyads, triads, partial chords, mute, volume, score and highlight lifecycle")
+	print("PASS: actual audio bus output, clicked MIDI pitches, dyads, triads, five-string grips, partial chords, mute, volume, score and highlight lifecycle")
 
 
 func _auto_advance_tests() -> void:

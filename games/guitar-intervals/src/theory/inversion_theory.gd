@@ -2,6 +2,7 @@ extends RefCounted
 ## Chord grips, spelled degrees and actual bass on consecutive guitar strings.
 
 const Theory = preload("res://src/theory/fretboard_theory.gd")
+const Fingering = preload("res://src/theory/guitar_fingering.gd")
 const TRIAD_IDS: Array[int] = [0, 1, 2, 3]
 const SEVENTH_IDS: Array[int] = [4, 5, 6, 7, 12, 13]
 const SIXTH_IDS: Array[int] = [8, 9]
@@ -51,7 +52,7 @@ static func string_rows(chord_index: int, highest_group: bool = false) -> Array[
 
 static func span_rows(count: int, first_string: int) -> Array[int]:
 	var rows: Array[int] = []
-	if count in [3, 4] and first_string >= 1 and first_string + count - 1 <= 6:
+	if count in [3, 4, 5] and first_string >= 1 and first_string + count - 1 <= 6:
 		rows.assign(range(first_string + count - 2, first_string - 2, -1))
 	return rows
 
@@ -60,7 +61,7 @@ static func span_rows(count: int, first_string: int) -> Array[int]:
 static func available_inversions(chord_index: int, count: int) -> Array[int]:
 	var degrees: Array[int] = []
 	var chord := definition(chord_index)
-	if chord.is_empty() or count not in [3, 4]:
+	if chord.is_empty() or count not in [3, 4, 5]:
 		return degrees
 	if count == 3 and chord.full_tones.size() == 4:
 		if chord.full_tones[2] == 7:
@@ -77,7 +78,7 @@ static func supports_count(chord_index: int, count: int) -> bool:
 static func playable_inversions(chord_index: int, root_pc: int, count: int, first_string: int) -> Array[int]:
 	var playable: Array[int] = []
 	for inversion in available_inversions(chord_index, count):
-		if not span_voicings(chord_index, root_pc, inversion, count, first_string).is_empty():
+		if not _find_voicings(chord_index, root_pc, inversion, count, first_string, true).is_empty():
 			playable.append(inversion)
 	return playable
 
@@ -90,6 +91,10 @@ static func voicings(chord_index: int, root_pc: int, inversion: int, highest_gro
 
 
 static func span_voicings(chord_index: int, root_pc: int, inversion: int, count: int, first_string: int) -> Array[Array]:
+	return _find_voicings(chord_index, root_pc, inversion, count, first_string, false)
+
+
+static func _find_voicings(chord_index: int, root_pc: int, inversion: int, count: int, first_string: int, first_only: bool) -> Array[Array]:
 	var shapes: Array[Array] = []
 	var rows := span_rows(count, first_string)
 	var degrees := available_inversions(chord_index, count)
@@ -101,25 +106,25 @@ static func span_voicings(chord_index: int, root_pc: int, inversion: int, count:
 	for degree in degrees:
 		tones.append(full_tones[degree])
 	var partial: Array[Vector2i] = []
-	_collect(tones, root_pc, bass, rows, 0, partial, shapes)
-	shapes.sort_custom(func(a: Array, b: Array) -> bool:
-		return _example_rank(a, tones, root_pc, bass) < _example_rank(b, tones, root_pc, bass))
+	_collect(tones, root_pc, bass, rows, 0, Vector2i(Theory.LAST_FRET, 0), partial, shapes, first_only)
+	if not first_only and shapes.size() > 1:
+		var ranks := {}
+		for shape in shapes:
+			ranks[shape] = _example_rank(shape, tones, root_pc, bass)
+		shapes.sort_custom(func(a: Array, b: Array) -> bool: return ranks[a] < ranks[b])
 	return shapes
 
 
-static func _collect(tones: Array, root_pc: int, inversion: int, rows: Array[int], used: int, partial: Array[Vector2i], shapes: Array[Array]) -> void:
+static func _collect(tones: Array, root_pc: int, inversion: int, rows: Array[int], used: int, frets: Vector2i, partial: Array[Vector2i], shapes: Array[Array], first_only: bool) -> void:
 	if partial.size() == rows.size():
 		if used != (1 << tones.size()) - 1:
 			return
 		var lowest_midi: int = Theory.midi(partial[0])
-		var min_fret: int = Theory.LAST_FRET
-		var max_fret: int = 0
 		for position in partial:
 			lowest_midi = mini(lowest_midi, Theory.midi(position))
-			if position.y > 0:
-				min_fret = mini(min_fret, position.y)
-				max_fret = maxi(max_fret, position.y)
-		if max_fret - min_fret <= Theory.LOCAL_RADIUS and posmod(lowest_midi - root_pc, 12) == tones[inversion]:
+		if posmod(lowest_midi - root_pc, 12) != tones[inversion]:
+			return
+		if rows.size() < 5 or not Fingering.fingers(partial).is_empty():
 			shapes.append(partial.duplicate())
 		return
 	var row := rows[partial.size()]
@@ -129,9 +134,16 @@ static func _collect(tones: Array, root_pc: int, inversion: int, rows: Array[int
 			continue
 		var first_fret := posmod(root_pc + int(tones[degree]) - Theory.OPEN_MIDI[row], 12)
 		for fret in range(first_fret, Theory.LAST_FRET + 1, 12):
+			var next_frets := frets
+			if fret > 0:
+				next_frets = Vector2i(mini(frets.x, fret), maxi(frets.y, fret))
+				if next_frets.y - next_frets.x > Theory.LOCAL_RADIUS:
+					continue
 			partial.append(Vector2i(row, fret))
-			_collect(tones, root_pc, inversion, rows, used | bit, partial, shapes)
+			_collect(tones, root_pc, inversion, rows, used | bit, next_frets, partial, shapes, first_only)
 			partial.pop_back()
+			if first_only and not shapes.is_empty():
+				return
 
 
 ## Prefer close-position triads and drop-2 sevenths for the example and hint.
@@ -149,7 +161,17 @@ static func _example_rank(shape: Array, tones: Array, root_pc: int, inversion: i
 		highest_fret = maxi(highest_fret, position.y)
 		lowest_fret = mini(lowest_fret, position.y)
 	var conventional := ascending and previous - first < 12
-	if shape.size() == 4 and tones.size() == 3:
+	if shape.size() == 5:
+		# Movable E/A-style shapes double the fifth at the octave, e.g.
+		# Cm7 on 6–2 as C–G–B♭–E♭–G. Rotate these degrees for inversions.
+		var order := [0, 2, 3, 1, 2] if tones.size() == 4 else [0, 2, 0, 1, 2]
+		var top_degree: int = tones[(inversion + 2) % tones.size()]
+		conventional = ascending and previous - first == 12 + posmod(top_degree - int(tones[inversion]), 12)
+		for i in range(shape.size()):
+			if posmod(Theory.midi(shape[i]) - root_pc, 12) != tones[(inversion + int(order[i])) % tones.size()]:
+				conventional = false
+				break
+	elif shape.size() == 4 and tones.size() == 3:
 		# A close four-string triad doubles the bass one octave above.
 		conventional = ascending and previous - first == 12
 	elif shape.size() == 4:
