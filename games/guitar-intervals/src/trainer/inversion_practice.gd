@@ -325,6 +325,7 @@ func _adapt_layout() -> void:
 		inversion_buttons[i].text = SHORT_INVERSIONS[i] if size.x < 800 else INVERSION_NAMES[i]
 		inversion_buttons[i].custom_minimum_size.x = 48 if size.x < 800 else 56
 	display_header.vertical = size.x < 630
+	question.add_theme_font_size_override("font_size", 20 if size.x < 480 else 24)
 	details_row.vertical = size.x < 670
 	screen_actions.custom_minimum_size.x = 0 if details_row.vertical else 290
 
@@ -469,7 +470,7 @@ func _start_question(preferred_shape: int = 0) -> void:
 			button.tooltip_text += "　此弦組與配置無可用按法"
 		button.set_pressed_no_signal(i == inversion)
 		if i == inversion:
-			question.text = "%s　%s · %d–%d 弦" % [slash, INVERSION_NAMES[i], first_string, first_string + string_count - 1]
+			question.text = "%s　%s · %d–%d\u00a0弦" % [slash, INVERSION_NAMES[i], first_string, first_string + string_count - 1]
 	composition.text = "組成音  %s" % " · ".join(names)
 	formula_label.text = "音級  %s" % chord.formula
 	bass_label.text = "● 最低音  %s（%s）" % [names[inversion], Inversions.degree_name(chord_index, inversion)]

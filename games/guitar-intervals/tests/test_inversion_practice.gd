@@ -257,6 +257,7 @@ func check_selector_layout() -> void:
 		else:
 			check(sections.back().global_position.y > sections.front().global_position.y, "Phone wraps complete groups")
 		check(page.question.text.contains("Cm7/E♭") and page.formula_label.text.contains("♭7"), "Full slash chord and formula remain on screen")
+		check(page.question.get_line_count() == 1, "Cm7/E-flat and its string range fit on one line")
 		for element: Control in [app, page, page.composition, page.formula_label, page.board, page.question, page.region_controls]:
 			check(element.get_global_rect().end.x <= viewport_size.x + 1, "Full chord fits the actual window, including its composition")
 		await save_preview("chord-controls-%d" % viewport_size.x)
