@@ -23,6 +23,7 @@ var hovered := Vector2i(-1, -1)
 var sounding: Array[Vector2i] = []
 var named_positions: Array[Vector2i] = [] # Keep labels after the sound ends.
 var note_labels: Dictionary = {} # Primary label for each selected or revealed position.
+var finger_labels: Dictionary[Vector2i, String] = {}
 var secondary_labels: Dictionary = {} # Optional second line inside the same circle.
 var active_rows: Array[int] = [] # Empty enables the whole fretboard.
 var listening_target := Vector2i(-1, -1)
@@ -165,6 +166,7 @@ func _draw() -> void:
 		var first := bank * columns + 1
 		_draw_bank(first, mini(first + columns - 1, _last_fret()))
 	_draw_notes()
+	_draw_finger_labels()
 
 
 func _draw_bank(first: int, last: int) -> void:
@@ -277,3 +279,29 @@ func _draw_notes() -> void:
 		draw_arc(cell_center(listening_target), 20, 0, TAU, 48, GOLD, 1.5, true)
 	for position in sounding:
 		draw_arc(cell_center(position), 23, 0, TAU, 48, INK, 2.0, true)
+
+
+func _draw_finger_labels() -> void:
+	var font := get_theme_font("font")
+	for position: Vector2i in finger_labels:
+		var center := cell_center(position)
+		var caption := finger_labels[position]
+		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x + 8
+		var badge := Rect2(center + Vector2(24, -10), Vector2(width, 20))
+		# Each string has one grip note. Leave room for a second, auditioned note.
+		var prefer_left := badge.end.x > size.x - RIGHT_MARGIN
+		for other in named_positions:
+			if other == position or other.x != position.x:
+				continue
+			var other_center := cell_center(other)
+			if badge.grow(19).has_point(other_center):
+				prefer_left = true
+		if prefer_left:
+			badge.position.x = center.x - 24 - width
+		# A tapped neighbouring fret can occupy the last free side on a narrow bank.
+		for other in named_positions:
+			if other != position and other.x == position.x and badge.grow(19).has_point(cell_center(other)):
+				badge.position.y = center.y - 34
+		badge.position.x = clampf(badge.position.x, 1, size.x - width - 1)
+		draw_rect(badge, P.SCREEN)
+		_text(badge.position + Vector2(4, 15), caption, INK, 13)

@@ -52,9 +52,11 @@ var count_buttons: Array[Button] = []
 var string_group_buttons: Array[Button] = []
 var inversion_buttons: Array[Button] = []
 var display_buttons: Array[Button] = []
+var finger_toggle: CheckButton
 var settings: VBoxContainer
 var selector_grid: GridContainer
 var region_controls: BoxContainer
+var display_controls: BoxContainer
 var display_header: BoxContainer
 var details_row: BoxContainer
 var screen_actions: HFlowContainer
@@ -233,7 +235,9 @@ func _build_controls() -> void:
 	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	question.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	display_header.add_child(question)
-	var display_choice := _control_group(display_header, "指板標示", P.SCREEN_MUTED)
+	display_controls = BoxContainer.new()
+	display_header.add_child(display_controls)
+	var display_choice := _control_group(display_controls, "指板標示", P.SCREEN_MUTED)
 	display_buttons = _keys(display_choice, ["音名", "音程", "兩者"], _set_display_mode)
 	display_buttons[DisplayMode.INTERVAL].tooltip_text = "以和弦根音為基準。R 是根音，m3 是小三度。"
 	display_buttons[DisplayMode.BOTH].tooltip_text = "圓點上行顯示音名，下行顯示相對於和弦根音的音程。"
@@ -242,6 +246,15 @@ func _build_controls() -> void:
 			button.add_theme_stylebox_override(state, P.key(P.TARGET, true))
 			button.add_theme_color_override("font_%s_color" % state, P.INK)
 	display_buttons[display_mode].set_pressed_no_signal(true)
+	finger_toggle = CheckButton.new()
+	finger_toggle.text = "顯示指法"
+	finger_toggle.tooltip_text = "在按弦圓點旁標示建議使用的手指"
+	finger_toggle.custom_minimum_size.y = 44
+	finger_toggle.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+		finger_toggle.add_theme_stylebox_override(state, P.key(P.KEY, false))
+	finger_toggle.toggled.connect(func(_enabled: bool) -> void: _refresh())
+	display_controls.add_child(finger_toggle)
 	details_row = BoxContainer.new()
 	screen.add_child(details_row)
 	var chord_info := _flow(details_row)
@@ -266,7 +279,7 @@ func _build_controls() -> void:
 	listen_button.add_theme_stylebox_override("focus", play_focus)
 	for state in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
 		listen_button.add_theme_color_override(state, P.INK)
-	reveal_button = _button(screen_actions, "遮住指法", _toggle_reference)
+	reveal_button = _button(screen_actions, "遮住位置", _toggle_reference)
 	practice_button = _button(screen_actions, "用這個練習", _enter_practice)
 	back_button = _button(screen_actions, "← 返回查閱", return_to_lookup)
 	board = Board.new()
@@ -326,7 +339,8 @@ func _adapt_layout() -> void:
 	for i in inversion_buttons.size():
 		inversion_buttons[i].text = SHORT_INVERSIONS[i] if size.x < 800 else INVERSION_NAMES[i]
 		inversion_buttons[i].custom_minimum_size.x = 48 if size.x < 800 else 56
-	display_header.vertical = size.x < 630
+	display_header.vertical = size.x < 800
+	display_controls.vertical = size.x < 450
 	question.add_theme_font_size_override("font_size", 20 if size.x < 480 else 24)
 	details_row.vertical = size.x < 670
 	screen_actions.custom_minimum_size.x = 0 if details_row.vertical else 290
@@ -693,6 +707,7 @@ func _refresh() -> void:
 	board.named_positions.assign(selection)
 	board.note_labels.clear()
 	board.secondary_labels.clear()
+	board.finger_labels.clear()
 	board.markers.clear()
 	if last_position != NO_POSITION and not board.named_positions.has(last_position):
 		board.named_positions.append(last_position)
@@ -711,6 +726,7 @@ func _refresh() -> void:
 	board.queue_redraw()
 	board.focus_voicing(shapes[shape_index] if not is_practicing and not shapes.is_empty() else [])
 	var showing_shape := (complete or revealed) and not shapes.is_empty()
+	finger_toggle.disabled = not showing_shape
 	var fingers: Array[int] = []
 	if showing_shape:
 		fingers = Fingering.fingers(shapes[shape_index])
@@ -724,7 +740,10 @@ func _refresh() -> void:
 				var fret := "空弦" if position.y == 0 else "%d 品" % position.y
 				slot = "%d 弦  %s %s" % [row + 1, fret, _pitch_caption(Theory.midi(position))]
 				if showing_shape and position.y > 0:
-					slot += "・" + FINGER_NAMES[fingers[shapes[shape_index].find(position)]]
+					var finger: String = FINGER_NAMES[fingers[shapes[shape_index].find(position)]]
+					slot += "・" + finger
+					if finger_toggle.button_pressed:
+						board.finger_labels[position] = finger
 				break
 		entries.append(slot)
 	readout.text = "     ｜     ".join(entries)
@@ -732,7 +751,7 @@ func _refresh() -> void:
 	stats.text = "答對 %d 題　錯點 %d 次" % [correct_count, mistakes]
 	listen_button.text = "試聽和弦" if showing_shape or selection.is_empty() else "播放已選音"
 	listen_button.disabled = shapes.is_empty()
-	reveal_button.text = "遮住指法" if revealed else "顯示指法"
+	reveal_button.text = "遮住位置" if revealed else "查看位置"
 	reveal_button.visible = not complete
 	practice_button.visible = not is_practicing
 	practice_button.disabled = shapes.is_empty()
