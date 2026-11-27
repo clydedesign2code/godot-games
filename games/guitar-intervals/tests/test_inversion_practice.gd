@@ -86,7 +86,7 @@ func _run() -> void:
 		check(page.quality_buttons[id].is_visible_in_tree(), "Common quality has a direct key")
 	check(not page.quality_buttons[11].is_visible_in_tree() and page.more_quality_button.visible, "Additional qualities start collapsed")
 	check(not page.next_button.is_visible_in_tree() and not page.stats.is_visible_in_tree() and not page.feedback.is_visible_in_tree(), "Lookup hides exercise-only controls and feedback")
-	check(page.board.first_focused_fret > 0, "Reference uses a focused neck")
+	check(page.board.last_focused_fret > 0, "Reference uses a focused neck")
 	check_grip("Initial C")
 	check(page.question.text.contains("C") and page.readout.text.contains("指 "), "Reference includes the chord and left hand fingering")
 	await click(page.quality_buttons[6])
@@ -122,7 +122,7 @@ func _run() -> void:
 	await click(page.display_buttons[1])
 	check(page.board.note_labels[Vector2i(1,1)] == "R" and page.board.secondary_labels.is_empty(), "Root present in interval-only view")
 	await click(page.reveal_button)
-	check(not page.revealed and page.board.markers.is_empty() and page.board.first_focused_fret > 0, "Cover hides the lookup dots without starting a scored exercise")
+	check(not page.revealed and page.board.markers.is_empty() and page.board.last_focused_fret > 0, "Cover hides the lookup dots without starting a scored exercise")
 	await pick(4,2)
 	check(page.correct_count == 0 and page.mistakes == 0 and page.selection.is_empty() and page.board.markers.is_empty(), "A click in covered lookup only auditions")
 	await click(page.reveal_button)
@@ -141,7 +141,7 @@ func _run() -> void:
 	var original: String = page.question.text
 	await click(page.practice_button)
 	check(page.is_practicing and page.question.text == original and page.selection.is_empty(), "Recall begins with exactly the displayed chord")
-	check(page.board.first_focused_fret == 0 and page.stats.visible and page.next_button.visible and page.settings.visible == false, "Practice uses full neck, stats and next question")
+	check(page.board.last_focused_fret == 0 and page.stats.visible and page.next_button.visible and page.settings.visible == false, "Practice uses full neck, stats and next question")
 	check(page.board.markers.is_empty() and page.board.secondary_labels.is_empty() and not page.revealed, "Fresh practice reveals no dots")
 	await click(page.listen_button)
 	var expected_notes: Array[int] = []

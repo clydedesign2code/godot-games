@@ -65,7 +65,7 @@ func check_entry() -> void:
 	await settle()
 	var page: Control = app.inversion_practice
 	board = page.board
-	check(page.visible and board.first_focused_fret > 0, "Main scene opens a focused voicing")
+	check(page.visible and board.last_focused_fret > 0, "Main scene opens a focused voicing")
 	var original: Array = page.selection.duplicate()
 	for pos: Vector2i in original:
 		var center: Vector2 = board.cell_center(pos)
@@ -73,9 +73,9 @@ func check_entry() -> void:
 		await click(board, center)
 		check(app.tone_player.current_notes == [Theory.midi(pos)], "Tapping the drawn fret plays that string and fret")
 	await click(page.practice_button)
-	check(board.first_focused_fret == 0 and board.markers.is_empty(), "Entering recall restores full neck and clears the displayed answer")
+	check(board.last_focused_fret == 0 and board.markers.is_empty(), "Entering recall restores full neck and clears the displayed answer")
 	await click(page.back_button)
-	check(board.first_focused_fret > 0 and page.selection == original, "Returning to lookup restores the voicing")
+	check(board.last_focused_fret > 0 and page.selection == original, "Returning to lookup restores the voicing")
 	app.queue_free()
 	await settle()
 
@@ -97,26 +97,28 @@ func set_width(width: float) -> void:
 	await settle()
 
 
-func check_full(width: float, split: bool) -> void:
+func check_full(width: float, expected_banks: int) -> void:
 	await set_width(width)
+	check(board._bank_count() == expected_banks, "Full neck wraps to fit labelled frets")
 	var open: Vector2 = board.cell_center(Vector2i(0, 0))
-	var eighth: Vector2 = board.cell_center(Vector2i(0, 8))
-	check(is_equal_approx(eighth.x, open.x) and eighth.y > open.y if split else eighth.x > open.x and is_equal_approx(eighth.y, open.y), "Actual fret 8 starts in the correct bank")
+	var first: Vector2 = board.cell_center(Vector2i(0, 1))
+	check(open.x < first.x and is_equal_approx(open.y, first.y), "Open strings sit to the left of fret 1")
+	check(board._column_width() >= board.MIN_FRET_WIDTH, "Each numbered fret has room for its heading")
 	for string in range(6):
 		for fret in range(16):
 			var pos := Vector2i(string, fret)
 			var center: Vector2 = board.cell_center(pos)
 			check(Rect2(Vector2.ZERO, board.size).has_point(center), "Visible fret inside bounds")
 			check_hit(center, pos)
-	var half_cell: float = (board.cell_center(Vector2i(0, 1)).x - open.x) * 0.5
-	check_hit(open - Vector2(half_cell - 0.2, 0), Vector2i(0, 0))
-	check_hit(open - Vector2(half_cell + 0.2, 0), NONE)
+	check_hit(Vector2(board.STRING_LABEL_WIDTH - 0.2, open.y), Vector2i(0, 0))
+	check_hit(Vector2(board.STRING_LABEL_WIDTH + 0.2, open.y), Vector2i(0, 1))
+	check_hit(Vector2(-1, open.y), NONE)
+	if expected_banks > 1:
+		var next_bank: Vector2 = board.cell_center(Vector2i(0, board._column_count() + 1))
+		check(is_equal_approx(next_bank.x, first.x) and next_bank.y > first.y, "Numbering continues at the start of the next row")
+		check_hit(Vector2(open.x, next_bank.y), NONE)
 	var last: Vector2 = board.cell_center(Vector2i(5, 15))
-	check_hit(last + Vector2(half_cell - 0.2, 0), Vector2i(5, 15))
-	check_hit(last + Vector2(half_cell + 0.2, 0), NONE)
-	if split:
-		check_hit(Vector2(eighth.x, board.size.y * 0.5 - 1), NONE)
-		check_hit(Vector2(eighth.x, board.size.y * 0.5 + 1), NONE)
+	check_hit(last + Vector2(board._column_width() * 0.5 + 0.2, 0), NONE)
 
 
 func check_focused() -> void:
@@ -124,18 +126,20 @@ func check_focused() -> void:
 	check(grip in Model.span_voicings(0, 0, 1, 3, 1), "Test uses a real C/E with an open high E")
 	board.focus_voicing(grip)
 	await set_width(320)
-	check(board._column_count() == 6 and board.first_focused_fret == 11, "Open column plus frets 11–15 on the small board")
+	check(board.last_focused_fret == 13, "High shape includes every fret up to its highest note")
 	for pos: Vector2i in grip:
 		check_hit(board.cell_center(pos), pos)
-	check(board.cell_center(Vector2i(2, 10)).x < 0, "A hidden fret has no drawn cell")
+	for fret in range(1, 14):
+		check_hit(board.cell_center(Vector2i(2, fret)), Vector2i(2, fret))
+	check(board.cell_center(Vector2i(2, 14)).x < 0, "A fret past the lookup range has no drawn cell")
 	move(board.global_position + board.cell_center(grip[0]))
 	check(board.hovered == grip[0] and board.tooltip_text.contains("12 品"), "Hover reads the focused cell")
 	board.focus_voicing([Vector2i(0, 0), Vector2i(1, 1), Vector2i(2, 0)])
-	check(board.first_focused_fret == 1 and board.hovered == NONE and board.tooltip_text.is_empty(), "Changing fret window clears stale hover and tooltip")
+	check(board.last_focused_fret == 5 and board.hovered == NONE and board.tooltip_text.is_empty(), "Changing fret window clears stale hover and tooltip")
 	check_hit(board.cell_center(Vector2i(1, 1)), Vector2i(1, 1))
 	move(board.global_position + board.cell_center(Vector2i(1, 1)))
 	board.focus_voicing([])
-	check(board.first_focused_fret == 0 and board.hovered == NONE and board.tooltip_text.is_empty(), "Clearing focus restores the full neck without stale metadata")
+	check(board.last_focused_fret == 0 and board.hovered == NONE and board.tooltip_text.is_empty(), "Clearing focus restores the full neck without stale metadata")
 
 
 func check_rendered_banks() -> void:
@@ -170,12 +174,12 @@ func _run() -> void:
 	root.add_child(board)
 	board.note_pressed.connect(func(pos: Vector2i) -> void: pressed.append(pos))
 	await settle()
-	await check_full(650, false)
+	await check_full(900, 1)
 	move(board.global_position + board.cell_center(Vector2i(0, 15)))
-	await check_full(649, true)
+	await check_full(649, 2)
 	check(board.hovered == NONE and board.tooltip_text.is_empty(), "Changing banks clears the previous full-neck hover")
 	await check_focused()
-	await check_full(320, true)
+	await check_full(320, 3)
 	await check_rendered_banks()
 	print("Board layout (%s): %d checks, %d failures" % [DisplayServer.get_name(), checks, failures])
 	quit(1 if failures else 0)
