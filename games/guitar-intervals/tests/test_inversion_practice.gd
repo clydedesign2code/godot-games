@@ -246,7 +246,7 @@ func check_selector_layout() -> void:
 		var sections: Array = page.region_controls.get_children()
 		var last_rect := Rect2()
 		var first_x: float = sections.front().get_child(1).global_position.x
-		for section: Control in sections:
+		for section: Control in sections + [page.inversion_section]:
 			var heading: Label = section.get_child(0)
 			var keys: Container = section.get_child(1)
 			var first_key: Rect2 = keys.get_child(0).get_global_rect()
@@ -261,9 +261,18 @@ func check_selector_layout() -> void:
 				if key.is_visible_in_tree():
 					check(key.get_global_rect().end.x <= viewport_size.x and key.size.x >= 44 and key.size.y >= 44, "All keys are visible touch targets")
 		if viewport_size.x >= 768:
-			check(is_equal_approx(sections.front().global_position.y, sections.back().global_position.y), "iPad and desktop align all three group headings at %s; target %s, group minima %s" % [viewport_size, page.region_controls.size, sections.map(func(s: Control): return s.get_combined_minimum_size())])
+			check(is_equal_approx(sections.front().global_position.y, sections.back().global_position.y), "iPad and desktop align string-count and string-group headings at %s; target %s, group minima %s" % [viewport_size, page.region_controls.size, sections.map(func(s: Control): return s.get_combined_minimum_size())])
 		else:
 			check(sections.back().global_position.y > sections.front().global_position.y, "Phone wraps complete groups")
+		var roots: Rect2 = page.root_buttons[0].get_global_rect()
+		var region: Rect2 = page.region_controls.get_global_rect()
+		var quality: Rect2 = page.quality_buttons[0].get_global_rect()
+		var inversion: Rect2 = page.inversion_section.get_global_rect()
+		if viewport_size.x >= 768:
+			check(roots.end.x <= region.position.x and roots.position.y < region.end.y, "Roots and string selectors share the first row")
+			check(region.end.y <= quality.position.y and quality.end.x <= inversion.position.x and quality.position.y < inversion.end.y, "Chord qualities and inversions share the second row")
+		else:
+			check(roots.end.y <= region.position.y and region.end.y <= quality.position.y and quality.end.y <= inversion.position.y, "Phone order is root, strings, quality, inversion")
 		check(page.question.text.contains("Cm7/E♭") and page.formula_label.text.contains("♭7"), "Full slash chord and formula remain on screen")
 		check(page.question.get_line_count() == 1, "Cm7/E-flat and its string range fit on one line")
 		for element: Control in [app, page, page.composition, page.formula_label, page.board, page.question, page.region_controls]:

@@ -56,6 +56,7 @@ var finger_toggle: CheckButton
 var settings: VBoxContainer
 var selector_grid: GridContainer
 var region_controls: BoxContainer
+var inversion_section: BoxContainer
 var display_controls: BoxContainer
 var display_header: BoxContainer
 var details_row: BoxContainer
@@ -140,14 +141,14 @@ func _section(parent: Container, caption: String) -> HFlowContainer:
 	return _flow(column)
 
 
-func _setting_keys(caption: String, stretch: float) -> HBoxContainer:
+func _setting_keys(parent: Container, caption: String, stretch: float) -> HBoxContainer:
 	var section := BoxContainer.new()
 	section.vertical = true
 	section.alignment = BoxContainer.ALIGNMENT_BEGIN
 	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	section.size_flags_stretch_ratio = stretch
 	section.add_theme_constant_override("separation", 5)
-	region_controls.add_child(section)
+	parent.add_child(section)
 	section.add_child(_label(caption, 13, P.MUTED))
 	var keys := HBoxContainer.new()
 	keys.add_theme_constant_override("separation", 5)
@@ -183,11 +184,33 @@ func _build_controls() -> void:
 	selector_grid = GridContainer.new()
 	selector_grid.columns = 2
 	selector_grid.add_theme_constant_override("h_separation", 14)
+	selector_grid.add_theme_constant_override("v_separation", 10)
 	settings.add_child(selector_grid)
 	var roots := _section(selector_grid, "根音")
 	var root_group := ButtonGroup.new()
 	for pc in [0, 2, 4, 5, 7, 9, 11, 1, 3, 6, 8, 10]:
 		root_buttons[pc] = _choice(roots, Theory.NOTE_NAMES[pc], root_group, _set_root.bind(pc))
+	region_controls = BoxContainer.new()
+	region_controls.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	selector_grid.add_child(region_controls)
+	count_buttons = _keys(_setting_keys(region_controls, "弦數", 0.18), ["3", "4", "5"], _set_count)
+	for i in count_buttons.size():
+		var button := count_buttons[i]
+		button.custom_minimum_size = Vector2(44, 52)
+		button.accessibility_name = "%d 條弦" % (i + 3)
+		button.tooltip_text = button.accessibility_name
+	var group_keys := _setting_keys(region_controls, "弦組", 0.32)
+	var area_group := ButtonGroup.new()
+	for first in range(1, 5):
+		var key := StringGroupKey.new()
+		key.toggle_mode = true
+		key.button_group = area_group
+		key.add_theme_stylebox_override("hover_pressed", P.key(P.SCREEN, true))
+		key.configure(first, 3)
+		key.pressed.connect(_set_region.bind(first))
+		group_keys.add_child(key)
+		string_group_buttons.append(key)
+
 	var qualities := _section(selector_grid, "和弦種類")
 	extra_qualities = _flow(qualities.get_parent())
 	extra_qualities.visible = false
@@ -202,26 +225,9 @@ func _build_controls() -> void:
 	more_quality_button.toggle_mode = true
 	more_quality_button.tooltip_text = "掛留、六和弦與其他變化和弦"
 
-	region_controls = BoxContainer.new()
-	settings.add_child(region_controls)
-	count_buttons = _keys(_setting_keys("弦數", 0.18), ["3", "4", "5"], _set_count)
-	for i in count_buttons.size():
-		var button := count_buttons[i]
-		button.custom_minimum_size = Vector2(44, 52)
-		button.accessibility_name = "%d 條弦" % (i + 3)
-		button.tooltip_text = button.accessibility_name
-	var group_keys := _setting_keys("弦組", 0.32)
-	var area_group := ButtonGroup.new()
-	for first in range(1, 5):
-		var key := StringGroupKey.new()
-		key.toggle_mode = true
-		key.button_group = area_group
-		key.add_theme_stylebox_override("hover_pressed", P.key(P.SCREEN, true))
-		key.configure(first, 3)
-		key.pressed.connect(_set_region.bind(first))
-		group_keys.add_child(key)
-		string_group_buttons.append(key)
-	inversion_buttons = _keys(_setting_keys("轉位", 0.5), INVERSION_NAMES, _set_inversion)
+	var inversion_keys := _setting_keys(selector_grid, "轉位", 1.0)
+	inversion_section = inversion_keys.get_parent()
+	inversion_buttons = _keys(inversion_keys, INVERSION_NAMES, _set_inversion)
 	for button in inversion_buttons:
 		button.custom_minimum_size = Vector2(56, 52)
 	var display := PanelContainer.new()
@@ -331,7 +337,7 @@ func _adapt_layout() -> void:
 	var stacked := size.x < 670
 	region_controls.vertical = stacked
 	region_controls.add_theme_constant_override("separation", 5 if stacked else (10 if size.x < 860 else 14))
-	for section: BoxContainer in region_controls.get_children():
+	for section: BoxContainer in [region_controls.get_child(0), region_controls.get_child(1), inversion_section]:
 		section.vertical = not stacked
 		section.add_theme_constant_override("separation", 8 if stacked else 5)
 		var label: Label = section.get_child(0)
