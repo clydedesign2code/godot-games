@@ -9,7 +9,8 @@ const Faceplate = preload("res://src/ui/faceplate.gd")
 const ExercisePanel = preload("res://src/ui/exercise_panel.gd")
 const VoiceQuiz = preload("res://src/voice/voice_quiz.gd")
 const InversionPractice = preload("res://src/trainer/inversion_practice.gd")
-const MODE_TITLES := ["查音程", "雙音練習", "和弦補音", "指板讀譜", "查和弦"]
+const TutorialPractice = preload("res://src/trainer/tutorial_practice.gd")
+const MODE_TITLES := ["查音程", "雙音練習", "和弦補音", "指板讀譜", "查和弦", "教學連結"]
 const MINT := P.SUCCESS
 const GOLD := P.TARGET
 const BLUE := P.FIFTH
@@ -89,6 +90,7 @@ var mono_font: Font
 var instrument_body: BoxContainer
 var volume_value: Label
 var voice_quiz: Control
+var tutorial_practice: Control
 var inversion_practice: Control
 var interval_panels: Array[Control] = []
 var last_click_position := Vector2i(-1, -1)
@@ -274,7 +276,7 @@ func _build_ui() -> void:
 	practice_tabs.add_theme_constant_override("h_separation", 8)
 	content.add_child(practice_tabs)
 	mode_buttons.resize(MODE_TITLES.size())
-	for index in [4, 0, 1, 2, 3]:
+	for index in [4, 0, 1, 2, 3, 5]:
 		var button := _button(MODE_TITLES[index], _navigate.bind(index))
 		button.toggle_mode = true
 		if index in [4, 0]:
@@ -440,6 +442,9 @@ func _build_ui() -> void:
 	inversion_practice.mono_font = mono_font
 	inversion_practice.visible = false
 	content.add_child(inversion_practice)
+	tutorial_practice = TutorialPractice.new()
+	tutorial_practice.tone_player = tone_player
+	content.add_child(tutorial_practice)
 	resized.connect(_update_instrument_layout)
 	_update_instrument_layout()
 
@@ -497,7 +502,8 @@ func _set_mode(value: int) -> void:
 	inversion_practice.set_active(mode == 4)
 	if mode == 4:
 		inversion_practice.return_to_lookup()
-	practice_tabs.visible = mode in [1, 2, 3]
+	tutorial_practice.set_active(mode == 5)
+	practice_tabs.visible = mode in [1, 2, 3, 5]
 	practice_nav_button.set_pressed_no_signal(practice_tabs.visible)
 	if practice_tabs.visible:
 		last_practice_mode = mode

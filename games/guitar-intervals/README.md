@@ -4,6 +4,12 @@
 
 **[開啟網頁版原型](https://clydedesign2code.github.io/godot-games/guitar-intervals/)**。首頁顯示高音 123 弦上的 C 大三和弦。點音可試聽，選「查音程」可探索根音附近的位置。從查閱按「用這個練習」才進入作答。獨立練習入口也可進入雙音、和弦補音與讀譜。網頁讀譜可輸入音名或固定唱名，原生 macOS 版另支援麥克風口說。
 
+## 從教學連結練琶音
+
+進入「練習 → 教學連結」，貼上 YouTube 單支影片網址，或按「用範例連結」。自行確認要練大三或小三和弦琶音後按「開始練習」。第一題從 C 根音與 1–3 弦開始，依提示在指定弦上點出根音、三度、五度。按「試聽琶音」可逐音聽示範。答對後換弦組，每四組換根音。
+
+題目與聲音由遊戲產生，連結保存在本次使用中，按「開啟原影片」可回到 YouTube。此流程不下載影片、字幕或音訊。
+
 ## 介面與視覺
 
 面板採奶灰色外殼、深色指板與獨立按鍵，視覺參考 Teenage Engineering 的工業設計。[OP–1 field](https://teenage.engineering/products/op-1)、[EP–133 K.O. II](https://teenage.engineering/products/ep-133)
