@@ -88,7 +88,7 @@ func _run() -> void:
 	check(not page.next_button.is_visible_in_tree() and not page.stats.is_visible_in_tree() and not page.feedback.is_visible_in_tree(), "Lookup hides exercise-only controls and feedback")
 	check(page.board.last_focused_fret > 0, "Reference uses a focused neck")
 	check_grip("Initial C")
-	check(page.question.text.contains("C") and page.readout.text.contains("指 "), "Reference includes the chord and left hand fingering")
+	check(page.question.text.contains("C") and page.readout.text.contains("食指") and not page.info_row.visible, "Reference includes the chord and left hand fingering")
 	await click(page.quality_buttons[6])
 	check(page.string_count == 4 and page.names == ["C","E♭","G","B♭"], "m7 shortcut opens a full seventh by default")
 	await click(page.count_buttons[0])

@@ -7,6 +7,7 @@ const Board = preload("res://src/fretboard/fretboard.gd")
 const StringGroupKey = preload("res://src/ui/string_group_key.gd")
 const P = preload("res://src/ui/instrument_theme.gd")
 
+const FINGER_NAMES := ["", "食指", "中指", "無名指", "小指"]
 const INVERSION_NAMES := ["原位", "第一轉位", "第二轉位", "第三轉位"]
 const SHORT_INVERSIONS := ["原位", "一轉", "二轉", "三轉"]
 const COMMON_QUALITIES := [0, 1, 6, 4, 5]
@@ -64,6 +65,7 @@ var question: Label
 var composition: Label
 var formula_label: Label
 var bass_label: Label
+var info_row: HBoxContainer
 var instruction: Label
 var readout: Label
 var feedback: Label
@@ -286,7 +288,7 @@ func _build_controls() -> void:
 	var controls := VBoxContainer.new()
 	controls.add_theme_constant_override("separation", 6)
 	footer.add_child(controls)
-	var info_row := HBoxContainer.new()
+	info_row = HBoxContainer.new()
 	controls.add_child(info_row)
 	instruction = _label("", 15, P.INK)
 	instruction.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -574,7 +576,7 @@ func _selection_error(position: Vector2i, proposed: Array[Vector2i]) -> String:
 func _select_position(position: Vector2i) -> void:
 	if not active or not Theory.is_position_valid(position):
 		return
-	if not board.active_rows.has(position.x):
+	if not board.active_rows.has(position.x) and (is_practicing or position.y != 0):
 		if is_practicing and not complete and not revealed:
 			_set_feedback("本題使用 %s。請點亮起的弦。" % string_group_label, P.INFO)
 		return
@@ -712,7 +714,6 @@ func _refresh() -> void:
 	var fingers: Array[int] = []
 	if showing_shape:
 		fingers = Fingering.fingers(shapes[shape_index])
-		instruction.text = "左手參考指法　1 食指　2 中指　3 無名指　4 小指。同指同品可用小橫按。"
 	shape_info.text = _describe_voicing(showing_shape)
 	shape_info.visible = not shape_info.text.is_empty()
 	var entries := PackedStringArray()
@@ -723,7 +724,7 @@ func _refresh() -> void:
 				var fret := "空弦" if position.y == 0 else "%d 品" % position.y
 				slot = "%d 弦  %s %s" % [row + 1, fret, _pitch_caption(Theory.midi(position))]
 				if showing_shape and position.y > 0:
-					slot += "・指 %d" % fingers[shapes[shape_index].find(position)]
+					slot += "・" + FINGER_NAMES[fingers[shapes[shape_index].find(position)]]
 				break
 		entries.append(slot)
 	readout.text = "     ｜     ".join(entries)
@@ -737,8 +738,9 @@ func _refresh() -> void:
 	practice_button.disabled = shapes.is_empty()
 	back_button.visible = is_practicing
 	settings.visible = not is_practicing
+	info_row.visible = is_practicing
+	instruction.visible = is_practicing and not showing_shape
 	stats.visible = is_practicing
-	instruction.visible = is_practicing or showing_shape
 	feedback.visible = is_practicing
 	next_button.visible = is_practicing
 	retry_button.visible = is_practicing and (complete or revealed)

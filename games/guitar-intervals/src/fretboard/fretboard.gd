@@ -28,7 +28,6 @@ var active_rows: Array[int] = [] # Empty enables the whole fretboard.
 var listening_target := Vector2i(-1, -1)
 var read_quiz: bool = false
 var quiz_target := Vector2i(-1, -1)
-const STRING_LABEL_WIDTH := 48.0
 const RIGHT_MARGIN := 8.0
 const MIN_FRET_WIDTH := 50.0
 var last_focused_fret := 0 # Zero shows the complete neck.
@@ -63,8 +62,12 @@ func _last_fret() -> int:
 	return last_focused_fret if last_focused_fret > 0 else Theory.LAST_FRET
 
 
+func _nut_x() -> float:
+	return clampf(size.x * 0.17, 62.0, 138.0)
+
+
 func _bank_count() -> int:
-	var capacity := maxi(1, floori((size.x - STRING_LABEL_WIDTH - RIGHT_MARGIN) / MIN_FRET_WIDTH))
+	var capacity := maxi(1, floori((size.x - _nut_x() - RIGHT_MARGIN) / MIN_FRET_WIDTH))
 	return ceili(float(_last_fret()) / capacity)
 
 
@@ -85,15 +88,15 @@ func cell_center(position: Vector2i) -> Vector2:
 		return Vector2(-100, -100)
 	var y := 46.0 + position.x * _row_height()
 	if position.y == 0:
-		return Vector2(STRING_LABEL_WIDTH * 0.5, y)
+		return Vector2(maxf(22.0, _nut_x() * (0.28 + position.x * 0.058)), y)
 	var index := position.y - 1
 	var columns := _column_count()
 	var bank := floori(float(index) / columns)
-	return Vector2(STRING_LABEL_WIDTH + (index % columns + 0.5) * _column_width(), bank * _bank_height() + y)
+	return Vector2(_nut_x() + (index % columns + 0.5) * _column_width(), bank * _bank_height() + y)
 
 
 func _column_width() -> float:
-	return (size.x - STRING_LABEL_WIDTH - RIGHT_MARGIN) / _column_count()
+	return (size.x - _nut_x() - RIGHT_MARGIN) / _column_count()
 
 
 func _bank_height() -> float:
@@ -109,8 +112,8 @@ func _position_at(point: Vector2) -> Vector2i:
 		return Vector2i(-1, -1)
 	var bank := floori(point.y / _bank_height())
 	var fret := 0
-	if point.x >= STRING_LABEL_WIDTH:
-		var column := floori((point.x - STRING_LABEL_WIDTH) / _column_width())
+	if point.x >= _nut_x():
+		var column := floori((point.x - _nut_x()) / _column_width())
 		fret = bank * _column_count() + column + 1
 		if column >= _column_count() or fret > _last_fret():
 			return Vector2i(-1, -1)
@@ -128,7 +131,7 @@ func _gui_input(event: InputEvent) -> void:
 		hovered = _position_at(event.position)
 		tooltip_text = ""
 		if Theory.is_position_valid(hovered):
-			tooltip_text = "%d 弦 · %d 品" % [hovered.x + 1, hovered.y]
+			tooltip_text = "%d 弦 · 空弦" % (hovered.x + 1) if hovered.y == 0 else "%d 弦 · 第 %d 品" % [hovered.x + 1, hovered.y]
 			if not active_rows.is_empty() and not active_rows.has(hovered.x):
 				tooltip_text += " · 此弦組範圍外"
 			elif not active_rows.is_empty() and not conceal_answers:
@@ -155,6 +158,8 @@ func _text(at: Vector2, value: String, color: Color, font_size: int = 15, center
 
 
 func _draw() -> void:
+	if _row_height() <= 0 or _column_width() <= 0:
+		return
 	var columns := _column_count()
 	for bank in range(_bank_count()):
 		var first := bank * columns + 1
@@ -166,7 +171,7 @@ func _draw_bank(first: int, last: int) -> void:
 	var cw: float = _column_width()
 	var top: float = cell_center(Vector2i(0, first)).y
 	var bottom: float = cell_center(Vector2i(5, first)).y
-	var right := STRING_LABEL_WIDTH + cw * (last - first + 1)
+	var right := _nut_x() + cw * (last - first + 1)
 	for fret in range(first, last + 1):
 		var x: float = cell_center(Vector2i(0, fret)).x
 		var active: bool = not nearby or absi(fret - root.y) <= Theory.LOCAL_RADIUS
@@ -181,11 +186,42 @@ func _draw_bank(first: int, last: int) -> void:
 	for string_index in range(6):
 		var y: float = cell_center(Vector2i(string_index, first)).y
 		var active_string := active_rows.is_empty() or active_rows.has(string_index)
-		_text(Vector2(STRING_LABEL_WIDTH * 0.5, y + 5), "%d  %s" % [string_index + 1, Theory.STRING_NAMES[string_index]], INK if active_string else MUTED, 14, true)
-		draw_line(Vector2(STRING_LABEL_WIDTH, y), Vector2(right, y), Color("637366") if active_string else P.SCREEN_GRID, 1.0 + string_index * 0.22, true)
+		if first > 1:
+			_text(Vector2(_nut_x() - 24.0, y + 5), "%d  %s" % [string_index + 1, Theory.STRING_NAMES[string_index]], INK if active_string else MUTED, 14, true)
+		draw_line(Vector2(_nut_x(), y), Vector2(right, y), Color("637366") if active_string else P.SCREEN_GRID, 1.0 + string_index * 0.22, true)
 	if first == 1:
-		_text(Vector2(STRING_LABEL_WIDTH * 0.5, top - 26), "空弦", MUTED, 12, true)
-		draw_line(Vector2(STRING_LABEL_WIDTH, top - 18), Vector2(STRING_LABEL_WIDTH, bottom + 18), INK, 3.0, true)
+		_draw_headstock(top, bottom)
+
+
+func _draw_headstock(top: float, bottom: float) -> void:
+	var nut := _nut_x()
+	var wood := Color("967852")
+	var chrome := Color("d2d6cc")
+	# Six inline tuners follow the swept edge; each remains on its string's hit row.
+	var outline := PackedVector2Array([
+		Vector2(nut, top - 13), Vector2(nut * 0.85, top - 13),
+		Vector2(nut * 0.72, top - 17), Vector2(nut * 0.55, top - 23),
+		Vector2(nut * 0.28, top - 23), Vector2(nut * 0.17, top - 17),
+		Vector2(nut * 0.13, top - 6), Vector2(nut * 0.39, bottom + 7),
+		Vector2(nut * 0.46, bottom + 18), Vector2(nut * 0.57, bottom + 21),
+		Vector2(nut * 0.66, bottom + 18), Vector2(nut * 0.76, bottom + 12),
+		Vector2(nut * 0.86, bottom + 11), Vector2(nut, bottom + 11)
+	])
+	draw_colored_polygon(outline, wood)
+	outline.append(outline[0])
+	draw_polyline(outline, Color("c1a27c"), 1.5, true)
+	for row in range(6):
+		var post := cell_center(Vector2i(row, 0))
+		var key_x := maxf(6.0, post.x - nut * 0.25)
+		var key := Vector2(key_x, post.y)
+		draw_line(key, post, chrome, 3.0, true)
+		draw_line(key - Vector2(0, 5), key + Vector2(0, 5), chrome, 6.0, true)
+		draw_line(post, Vector2(nut, post.y), Color("e3d6bf"), 1.1 + row * 0.2, true)
+		draw_circle(post, 13.5, chrome, true, -1, true)
+		draw_circle(post, 12, Color("343b36"), true, -1, true)
+		_text(post + Vector2(0, 4), "%d %s" % [row + 1, Theory.STRING_NAMES[row]], INK, 11, true)
+	_text(Vector2(nut * 0.5, top - 28), "空弦", MUTED, 12, true)
+	draw_line(Vector2(nut, top - 18), Vector2(nut, bottom + 18), INK, 4.0, true)
 
 
 func _draw_notes() -> void:
